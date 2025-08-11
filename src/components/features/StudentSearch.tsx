@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Search, Filter, Download, Star } from "lucide-react";
+import { Search, Filter, Download, Star, X } from "lucide-react";
 import { Button } from "../ui/Button";
+import { studentColumns, studentData } from "../../constants";
 
 export function StudentSearch() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -9,45 +10,17 @@ export function StudentSearch() {
     graduationYear: "",
     skills: "",
   });
-
-  const studentColumns = [
-    { key: "name", label: "Name" },
-    { key: "major", label: "Major" },
-    { key: "graduation", label: "Graduation" },
-    { key: "skills", label: "Key Skills" },
-    { key: "gpa", label: "GPA" },
-  ];
-
-  const studentData = [
-    {
-      id: "1",
-      name: "Alice Johnson",
-      major: "Computer Science",
-      graduation: "2024",
-      skills: "React, Python, Machine Learning",
-      gpa: "3.8",
-    },
-    {
-      id: "2",
-      name: "Bob Chen",
-      major: "Business Administration",
-      graduation: "2025",
-      skills: "Project Management, Analytics, Marketing",
-      gpa: "3.6",
-    },
-    {
-      id: "3",
-      name: "Carol Davis",
-      major: "Graphic Design",
-      graduation: "2024",
-      skills: "Adobe Creative Suite, UI/UX, Branding",
-      gpa: "3.9",
-    },
-  ];
+  const [cvModalOpen, setCvModalOpen] = useState(false);
+  const [selectedCv, setSelectedCv] = useState<string | null>(null);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Searching for:", searchQuery, filters);
+  };
+
+  const openCvModal = (cvUrl: string) => {
+    setSelectedCv(cvUrl);
+    setCvModalOpen(true);
   };
 
   return (
@@ -156,7 +129,7 @@ export function StudentSearch() {
           </div>
         </div>
 
-        {/* Enhanced Table with Action Buttons */}
+        {/* Table */}
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -186,7 +159,11 @@ export function StudentSearch() {
                     </td>
                   ))}
                   <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-                    <Button variant="outline" size="sm">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openCvModal(student.cvUrl)}
+                    >
                       <Download size={14} className="mr-1" />
                       View CV
                     </Button>
@@ -201,6 +178,28 @@ export function StudentSearch() {
           </table>
         </div>
       </div>
+
+      {/* CV Modal */}
+      {cvModalOpen && selectedCv && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full relative">
+            <button
+              onClick={() => setCvModalOpen(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+            >
+              <X size={20} />
+            </button>
+            <div className="p-4">
+              <h2 className="text-lg font-semibold mb-4">Student CV</h2>
+              <iframe
+                src={selectedCv}
+                className="w-full h-[70vh] border rounded"
+                title="Student CV"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

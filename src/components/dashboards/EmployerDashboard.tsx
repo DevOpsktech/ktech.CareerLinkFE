@@ -1,48 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { JobPostingForm } from "../forms/JobPostingForm";
 import { DataTable } from "../ui/DataTable";
-import { Plus, Search } from "lucide-react";
 import { StudentSearch } from "../features/StudentSearch";
+import { myJobsColumns, myJobsData, tabs } from "../../constants";
 
 export function EmployerDashboard() {
   const [activeTab, setActiveTab] = useState("jobs");
-
-  const myJobsColumns = [
-    { key: "title", label: "Job Title" },
-    { key: "applications", label: "Applications" },
-    { key: "status", label: "Status" },
-    { key: "posted", label: "Posted Date" },
-  ];
-
-  const myJobsData = [
-    {
-      id: "1",
-      title: "Frontend Developer",
-      applications: 25,
-      status: "Active",
-      posted: "2024-01-15",
-    },
-    {
-      id: "2",
-      title: "Product Manager",
-      applications: 42,
-      status: "Active",
-      posted: "2024-01-12",
-    },
-    {
-      id: "3",
-      title: "UX Designer",
-      applications: 18,
-      status: "Closed",
-      posted: "2024-01-08",
-    },
-  ];
-
-  const tabs = [
-    { key: "jobs", label: "My Jobs", icon: Plus },
-    { key: "post", label: "Post Job", icon: Plus },
-    { key: "students", label: "Find Students", icon: Search },
-  ];
 
   return (
     <div className="p-6 max-w-7xl mx-auto">

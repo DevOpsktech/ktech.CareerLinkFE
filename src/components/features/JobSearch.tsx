@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Search, MapPin, Clock, DollarSign, Building } from "lucide-react";
 import { Button } from "../ui/Button";
+import { jobs } from "../../constants";
 
 export function JobSearch() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -9,45 +10,6 @@ export function JobSearch() {
     jobType: "",
     company: "",
   });
-
-  const jobs = [
-    {
-      id: "1",
-      title: "Software Engineering Intern",
-      company: "TechCorp",
-      location: "New York, NY",
-      type: "Internship",
-      salary: "$25/hour",
-      description:
-        "Join our dynamic development team and work on cutting-edge web applications.",
-      posted: "2 days ago",
-      skills: ["React", "JavaScript", "Python"],
-    },
-    {
-      id: "2",
-      title: "Marketing Assistant",
-      company: "MarketPro",
-      location: "Chicago, IL",
-      type: "Part-time",
-      salary: "$20/hour",
-      description:
-        "Support marketing campaigns and social media management for growing startup.",
-      posted: "1 week ago",
-      skills: ["Social Media", "Content Creation", "Analytics"],
-    },
-    {
-      id: "3",
-      title: "Data Analyst",
-      company: "DataCo",
-      location: "San Francisco, CA",
-      type: "Full-time",
-      salary: "$70,000 - $85,000",
-      description:
-        "Analyze large datasets to derive business insights and support decision-making.",
-      posted: "3 days ago",
-      skills: ["SQL", "Python", "Tableau"],
-    },
-  ];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

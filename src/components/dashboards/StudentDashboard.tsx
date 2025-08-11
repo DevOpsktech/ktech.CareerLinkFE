@@ -1,48 +1,15 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ProfileForm } from "../forms/ProfileForm";
 import { DataTable } from "../ui/DataTable";
-import { User, Search, Bookmark } from "lucide-react";
 import { JobSearch } from "../features/JobSearch";
+import {
+  appliedJobsColumns,
+  appliedJobsData,
+  studentTabs,
+} from "../../constants";
 
 export function StudentDashboard() {
   const [activeTab, setActiveTab] = useState("jobs");
-
-  const appliedJobsColumns = [
-    { key: "title", label: "Job Title" },
-    { key: "company", label: "Company" },
-    { key: "appliedDate", label: "Applied Date" },
-    { key: "status", label: "Status" },
-  ];
-
-  const appliedJobsData = [
-    {
-      id: "1",
-      title: "Software Intern",
-      company: "TechCorp",
-      appliedDate: "2024-01-20",
-      status: "Under Review",
-    },
-    {
-      id: "2",
-      title: "Marketing Assistant",
-      company: "MarketPro",
-      appliedDate: "2024-01-18",
-      status: "Interview Scheduled",
-    },
-    {
-      id: "3",
-      title: "Data Analyst",
-      company: "DataCo",
-      appliedDate: "2024-01-15",
-      status: "Rejected",
-    },
-  ];
-
-  const tabs = [
-    { key: "jobs", label: "Find Jobs", icon: Search },
-    { key: "applied", label: "Applied Jobs", icon: Bookmark },
-    { key: "profile", label: "Profile", icon: User },
-  ];
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -59,7 +26,7 @@ export function StudentDashboard() {
       <div className="mb-8">
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8">
-            {tabs.map(({ key, label, icon: Icon }) => (
+            {studentTabs.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
                 onClick={() => setActiveTab(key)}
