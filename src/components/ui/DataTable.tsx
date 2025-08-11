@@ -1,4 +1,5 @@
 import { Edit, Trash2, Eye } from "lucide-react";
+import { Button } from "./Button";
 
 interface Column {
   key: string;
@@ -9,12 +10,14 @@ interface DataTableProps {
   columns: Column[];
   data: any[];
   showActions?: boolean;
+  employerActions?: boolean;
 }
 
 export function DataTable({
   columns,
   data,
   showActions = false,
+  employerActions = false,
 }: DataTableProps) {
   return (
     <div className="overflow-x-auto">
@@ -59,6 +62,28 @@ export function DataTable({
                     <button className="text-red-600 hover:text-red-800 p-1 rounded transition-colors">
                       <Trash2 size={16} />
                     </button>
+                  </div>
+                </td>
+              )}
+              {employerActions && (
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <div className="flex space-x-2">
+                    <Button
+                      type="button"
+                      variant="red"
+                      size="lg"
+                      className="w-full"
+                    >
+                      Reject
+                    </Button>
+                    <Button
+                      type="submit"
+                      variant="secondary"
+                      size="lg"
+                      className="w-full"
+                    >
+                      Accept
+                    </Button>
                   </div>
                 </td>
               )}

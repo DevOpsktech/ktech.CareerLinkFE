@@ -2,7 +2,14 @@ import { useState } from "react";
 import { JobPostingForm } from "../forms/JobPostingForm";
 import { DataTable } from "../ui/DataTable";
 import { StudentSearch } from "../features/StudentSearch";
-import { myJobsColumns, myJobsData, tabs } from "../../constants";
+import {
+  myJobsColumns,
+  myJobsData,
+  studentColumns,
+  studentData,
+  tabs,
+} from "../../constants";
+import { StudentTable } from "../ui/StudentTable";
 
 export function EmployerDashboard() {
   const [activeTab, setActiveTab] = useState("jobs");
@@ -63,6 +70,19 @@ export function EmployerDashboard() {
         )}
 
         {activeTab === "students" && <StudentSearch />}
+
+        {activeTab === "student-applied" && (
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              Students Who Applied
+            </h2>
+            <StudentTable
+              columns={studentColumns}
+              data={studentData}
+              actions={true}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

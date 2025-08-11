@@ -2,6 +2,7 @@ import {
   Bookmark,
   Briefcase,
   GraduationCap,
+  LucideUsers2,
   Plus,
   Search,
   User,
@@ -193,6 +194,7 @@ export const tabs = [
   { key: "jobs", label: "My Jobs", icon: Plus },
   { key: "post", label: "Post Job", icon: Plus },
   { key: "students", label: "Find Students", icon: Search },
+  { key: "student-applied", label: "Student Application", icon: LucideUsers2 },
 ];
 
 export const appliedJobsColumns = [

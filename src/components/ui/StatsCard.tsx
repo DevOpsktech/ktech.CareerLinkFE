@@ -1,10 +1,10 @@
-import { DivideIcon as LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 interface StatCardProps {
   label: string;
   value: string;
   icon: LucideIcon;
-  color: "blue" | "green" | "purple" | "red" | "yellow";
+  color: string;
 }
 
 export function StatCard({ label, value, icon: Icon, color }: StatCardProps) {

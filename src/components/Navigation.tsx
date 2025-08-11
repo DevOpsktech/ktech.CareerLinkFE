@@ -1,6 +1,7 @@
 import React from "react";
-import { Users, Briefcase, GraduationCap, Menu, X } from "lucide-react";
+import { Users, Briefcase, GraduationCap, Menu, X, LogOut } from "lucide-react";
 import type { UserRole } from "../types/user";
+import { useAuth } from "../contexts/AuthContext";
 
 interface NavigationProps {
   currentRole: UserRole;
@@ -9,6 +10,7 @@ interface NavigationProps {
 
 export function Navigation({ currentRole, onRoleChange }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const { user, logout } = useAuth();
 
   const roles = [
     { key: "admin" as UserRole, label: "Admin", icon: Users },
@@ -32,30 +34,42 @@ export function Navigation({ currentRole, onRoleChange }: NavigationProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex-shrink-0">
-            <h1 className="text-2xl font-bold text-gray-900">
-              <a href="/" className="decoration-0">
-                Career
-                <span className="text-blue-600">Link</span>
-              </a>
-            </h1>
+            <div className="flex items-center space-x-6">
+              <h1 className="text-2xl font-bold text-gray-900">
+                Career<span className="text-blue-600">Link</span>
+              </h1>
+              {user && (
+                <div className="hidden pt-2 md:block text-sm text-gray-600">
+                  Welcome, {user.name}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
-            {roles.map(({ key, label, icon: Icon }) => (
-              <button
-                key={key}
-                onClick={() => onRoleChange(key)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-white font-medium transition-colors ${
-                  currentRole === key
-                    ? getRoleColor(key)
-                    : "bg-gray-400 hover:bg-gray-500"
-                }`}
-              >
-                <Icon size={18} />
-                <span>{label}</span>
-              </button>
-            ))}
+            {user?.role === "admin" &&
+              roles.map(({ key, label, icon: Icon }) => (
+                <button
+                  key={key}
+                  onClick={() => onRoleChange(key)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-white font-medium transition-colors ${
+                    currentRole === key
+                      ? getRoleColor(key)
+                      : "bg-gray-400 hover:bg-gray-500"
+                  }`}
+                >
+                  <Icon size={18} />
+                  <span>{label}</span>
+                </button>
+              ))}
+            <button
+              onClick={logout}
+              className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-medium transition-colors"
+            >
+              <LogOut size={18} />
+              <span>Logout</span>
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -72,23 +86,34 @@ export function Navigation({ currentRole, onRoleChange }: NavigationProps) {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden py-4 space-y-2">
-            {roles.map(({ key, label, icon: Icon }) => (
-              <button
-                key={key}
-                onClick={() => {
-                  onRoleChange(key);
-                  setIsMenuOpen(false);
-                }}
-                className={`w-full flex items-center space-x-2 px-4 py-2 rounded-lg text-white font-medium transition-colors ${
-                  currentRole === key
-                    ? getRoleColor(key)
-                    : "bg-gray-400 hover:bg-gray-500"
-                }`}
-              >
-                <Icon size={18} />
-                <span>{label}</span>
-              </button>
-            ))}
+            {user?.role === "admin" &&
+              roles.map(({ key, label, icon: Icon }) => (
+                <button
+                  key={key}
+                  onClick={() => {
+                    onRoleChange(key);
+                    setIsMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center space-x-2 px-4 py-2 rounded-lg text-white font-medium transition-colors ${
+                    currentRole === key
+                      ? getRoleColor(key)
+                      : "bg-gray-400 hover:bg-gray-500"
+                  }`}
+                >
+                  <Icon size={18} />
+                  <span>{label}</span>
+                </button>
+              ))}
+            <button
+              onClick={() => {
+                logout();
+                setIsMenuOpen(false);
+              }}
+              className="w-full flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-medium transition-colors"
+            >
+              <LogOut size={18} />
+              <span>Logout</span>
+            </button>
           </div>
         )}
       </div>

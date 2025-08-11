@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ProfileForm } from "../forms/ProfileForm";
+import { ProfileForm } from "../forms/profile/ProfileForm";
 import { DataTable } from "../ui/DataTable";
 import { JobSearch } from "../features/JobSearch";
 import {

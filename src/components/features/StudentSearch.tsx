@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Search, Filter, Download, Star, X } from "lucide-react";
+import { Search, Filter, Download, X } from "lucide-react";
 import { Button } from "../ui/Button";
 import { studentColumns, studentData } from "../../constants";
+import { StudentTable } from "../ui/StudentTable";
 
 export function StudentSearch() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,9 +24,13 @@ export function StudentSearch() {
     setCvModalOpen(true);
   };
 
+  const handleShortlist = (student: any) => {
+    console.log("Shortlisted student:", student);
+  };
+
   return (
     <div className="space-y-6">
-      {/* Search and Filters */}
+      {/* Search + Filters */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">
           Find Students
@@ -129,54 +134,13 @@ export function StudentSearch() {
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                {studentColumns.map((column) => (
-                  <th
-                    key={column.key}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    {column.label}
-                  </th>
-                ))}
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {studentData.map((student) => (
-                <tr key={student.id} className="hover:bg-gray-50">
-                  {studentColumns.map((column) => (
-                    <td
-                      key={column.key}
-                      className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                    >
-                      {student[column.key as keyof typeof student]}
-                    </td>
-                  ))}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openCvModal(student.cvUrl)}
-                    >
-                      <Download size={14} className="mr-1" />
-                      View CV
-                    </Button>
-                    <Button variant="secondary" size="sm">
-                      <Star size={14} className="mr-1" />
-                      Shortlist
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <StudentTable
+          columns={studentColumns}
+          data={studentData}
+          onViewCv={openCvModal}
+          onShortlist={handleShortlist}
+          actions={true}
+        />
       </div>
 
       {/* CV Modal */}
