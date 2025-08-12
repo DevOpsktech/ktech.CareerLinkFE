@@ -1,46 +1,81 @@
-import React, { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { LoginPage } from "./components/auth/LoginPage";
 import { Navigation } from "./components/Navigation";
 import { AdminDashboard } from "./components/dashboards/AdminDashboard";
 import { EmployerDashboard } from "./components/dashboards/EmployerDashboard";
 import { StudentDashboard } from "./components/dashboards/StudentDashboard";
-import type { UserRole } from "./types/user";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
-
 function AppContent() {
   const { user } = useAuth();
-  const [currentRole, setCurrentRole] = useState<UserRole>(
-    user?.role || "student"
-  );
-
-  // Update currentRole when user changes
-  React.useEffect(() => {
-    if (user?.role) {
-      setCurrentRole(user.role);
-    }
-  }, [user?.role]);
 
   if (!user?.isAuthenticated) {
-    return <LoginPage />;
+    return (
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
   }
-
-  const renderDashboard = () => {
-    switch (currentRole) {
-      case "admin":
-        return <AdminDashboard />;
-      case "employer":
-        return <EmployerDashboard />;
-      case "student":
-        return <StudentDashboard />;
-      default:
-        return <StudentDashboard />;
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation currentRole={currentRole} onRoleChange={setCurrentRole} />
-      <main className="pt-16">{renderDashboard()}</main>
+      <Navigation />
+      <main className="pt-16">
+        <Routes>
+          {/* Admin Routes */}
+          {user.role === "admin" && (
+            <>
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/employer" element={<EmployerDashboard />} />
+              <Route path="/admin/student" element={<StudentDashboard />} />
+            </>
+          )}
+
+          {/* Employer Routes */}
+          {(user.role === "employer" || user.role === "admin") && (
+            <Route path="/employer" element={<EmployerDashboard />} />
+          )}
+
+          {/* Student Routes */}
+          {(user.role === "student" || user.role === "admin") && (
+            <Route path="/student" element={<StudentDashboard />} />
+          )}
+
+          {/* Default redirects based on user role */}
+          <Route
+            path="/"
+            element={
+              <Navigate
+                to={
+                  user.role === "admin"
+                    ? "/admin"
+                    : user.role === "employer"
+                    ? "/employer"
+                    : "/student"
+                }
+                replace
+              />
+            }
+          />
+
+          {/* Catch all - redirect to appropriate dashboard */}
+          <Route
+            path="*"
+            element={
+              <Navigate
+                to={
+                  user.role === "admin"
+                    ? "/admin"
+                    : user.role === "employer"
+                    ? "/employer"
+                    : "/student"
+                }
+                replace
+              />
+            }
+          />
+        </Routes>
+      </main>
     </div>
   );
 }

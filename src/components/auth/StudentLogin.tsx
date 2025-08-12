@@ -1,12 +1,18 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { Button } from "../ui/Button";
 import { GraduationCap, AlertCircle } from "lucide-react";
 
 export function StudentLogin() {
   const { loginWithMicrosoft, isLoading, error } = useAuth();
+  const navigate = useNavigate();
 
   const handleMicrosoftLogin = async () => {
-    await loginWithMicrosoft();
+    const success = await loginWithMicrosoft();
+    if (success) {
+      navigate("/student", { replace: true });
+    }
   };
 
   return (

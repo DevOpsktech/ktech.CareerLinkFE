@@ -1,14 +1,30 @@
-import { useState } from "react";
-
-import { Users, Briefcase, GraduationCap } from "lucide-react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import { AdminLogin } from "./AdminLogin";
 import { EmployerLogin } from "./EmployerLogin";
 import { StudentLogin } from "./StudentLogin";
+import { Users, Briefcase, GraduationCap } from "lucide-react";
 
 type LoginRole = "admin" | "employer" | "student";
 
 export function LoginPage() {
   const [selectedRole, setSelectedRole] = useState<LoginRole>("student");
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // Redirect if already authenticated
+  React.useEffect(() => {
+    if (user?.isAuthenticated) {
+      const redirectPath =
+        user.role === "admin"
+          ? "/admin"
+          : user.role === "employer"
+          ? "/employer"
+          : "/student";
+      navigate(redirectPath, { replace: true });
+    }
+  }, [user, navigate]);
 
   const roles = [
     {
@@ -52,6 +68,7 @@ export function LoginPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             Career<span className="text-blue-600">Link</span>
           </h1>
+          <p className="text-gray-600">Connect. Discover. Succeed.</p>
         </div>
 
         {/* Role Selection */}

@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { Button } from "../ui/Button";
 import { Lock, Mail, AlertCircle } from "lucide-react";
 
 export function AdminLogin() {
   const { login, isLoading, error } = useAuth();
+  const navigate = useNavigate();
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
@@ -12,7 +14,14 @@ export function AdminLogin() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(credentials.email, credentials.password, "admin");
+    const success = await login(
+      credentials.email,
+      credentials.password,
+      "admin"
+    );
+    if (success) {
+      navigate("/admin", { replace: true });
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
