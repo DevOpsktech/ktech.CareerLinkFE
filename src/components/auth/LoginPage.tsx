@@ -68,7 +68,6 @@ export function LoginPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             Career<span className="text-blue-600">Link</span>
           </h1>
-          <p className="text-gray-600">Connect. Discover. Succeed.</p>
         </div>
 
         {/* Role Selection */}
