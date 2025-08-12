@@ -2,16 +2,15 @@ import { DataTable } from "../ui/DataTable";
 import { StatCard } from "../ui/StatsCard";
 import { EmployerManagement } from "../features/EmployeeManagement";
 import { jobColumns, jobData, stats } from "../../constants";
+import Heading from "../ui/Heading";
 
 export function AdminDashboard() {
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Admin Dashboard
-        </h1>
-        <p className="text-gray-600">Manage your CareerLink platform</p>
-      </div>
+      <Heading
+        title="Admin Dashboard"
+        description="Manage your CareerLink platform"
+      />
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

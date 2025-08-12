@@ -7,20 +7,17 @@ import {
   appliedJobsData,
   studentTabs,
 } from "../../constants";
+import Heading from "../ui/Heading";
 
 export function StudentDashboard() {
   const [activeTab, setActiveTab] = useState("jobs");
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Student Dashboard
-        </h1>
-        <p className="text-gray-600">
-          Find your dream job and build your career
-        </p>
-      </div>
+      <Heading
+        title="Student Dashboard"
+        description="Find your dream job and build your career"
+      />
 
       {/* Tabs */}
       <div className="mb-8">

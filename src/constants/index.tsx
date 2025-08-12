@@ -194,7 +194,7 @@ export const tabs = [
   { key: "jobs", label: "My Jobs", icon: Plus },
   { key: "post", label: "Post Job", icon: Plus },
   { key: "students", label: "Find Students", icon: Search },
-  { key: "student-applied", label: "Student Application", icon: LucideUsers2 },
+  { key: "student-applied", label: "Student Applications", icon: LucideUsers2 },
 ];
 
 export const appliedJobsColumns = [

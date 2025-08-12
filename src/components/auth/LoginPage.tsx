@@ -83,11 +83,6 @@ export function LoginPage() {
             {renderLoginForm()}
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="text-center mt-6 text-sm text-gray-500">
-          <p>© 2024 CareerLink. All rights reserved.</p>
-        </div>
       </div>
     </div>
   );
