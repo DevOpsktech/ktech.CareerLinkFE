@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { authApi } from "../api/authApi";
 import type { AuthState, AuthUser } from "../types/auth";
 
 interface AuthContextType extends AuthState {
@@ -10,6 +11,7 @@ interface AuthContextType extends AuthState {
   loginWithMicrosoft: () => Promise<boolean>;
   logout: () => void;
   setUser: (user: AuthUser | null) => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,7 +32,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setAuthState((prev) => ({ ...prev, user }));
       } catch (error) {
         localStorage.removeItem("careerlink_user");
-        console.log("Error parsing saved user data:", error);
       }
     }
   }, []);
@@ -43,70 +44,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // Simulate API call - replace with actual authentication
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Mock authentication logic
-      if (role === "admin") {
-        if (email === "admin@careerlink.com" && password === "admin123") {
-          const user: AuthUser = {
-            id: "admin-1",
-            email,
-            name: "System Administrator",
-            role: "admin",
-            isAuthenticated: true,
-          };
-          setAuthState({ user, isLoading: false, error: null });
-          localStorage.setItem("careerlink_user", JSON.stringify(user));
-          return true;
-        }
-      } else if (role === "employer") {
-        // Mock employer validation - replace with actual database check
-        const mockEmployers = [
-          {
-            email: "hr@techcorp.com",
-            password: "tech123",
-            name: "TechCorp HR",
-            company: "TechCorp",
-          },
-          {
-            email: "careers@financeinc.com",
-            password: "finance123",
-            name: "Finance Inc HR",
-            company: "Finance Inc",
-          },
-        ];
-
-        const employer = mockEmployers.find(
-          (emp) => emp.email === email && emp.password === password
-        );
-        if (employer) {
-          const user: AuthUser = {
-            id: "employer-1",
-            email,
-            name: employer.name,
-            role: "employer",
-            isAuthenticated: true,
-          };
-          setAuthState({ user, isLoading: false, error: null });
-          localStorage.setItem("careerlink_user", JSON.stringify(user));
-          return true;
-        }
-      }
-
-      setAuthState((prev) => ({
-        ...prev,
-        isLoading: false,
-        error: "Invalid credentials",
-      }));
-      return false;
+      const response = await authApi.login(email, password, role);
+      const user = response.data;
+      setAuthState({ user, isLoading: false, error: null });
+      localStorage.setItem("careerlink_user", JSON.stringify(user));
+      return true;
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Login failed";
       setAuthState((prev) => ({
         ...prev,
         isLoading: false,
-        error: "Login failed",
+        error: errorMessage,
       }));
-      console.log("Error parsing saved user data:", error);
       return false;
     }
   };
@@ -115,33 +65,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // Simulate Microsoft OAuth - replace with actual MSAL implementation
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Mock successful OAuth response
-      const user: AuthUser = {
-        id: "student-1",
-        email: "student@university.edu",
-        name: "Haider Ghadi",
-        role: "student",
-        isAuthenticated: true,
-      };
-
+      const response = await authApi.loginWithMicrosoft();
+      const user = response.data;
       setAuthState({ user, isLoading: false, error: null });
       localStorage.setItem("careerlink_user", JSON.stringify(user));
       return true;
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Microsoft login failed";
       setAuthState((prev) => ({
         ...prev,
         isLoading: false,
-        error: "Microsoft login failed",
+        error: errorMessage,
       }));
-      console.log("Error parsing saved user data:", error);
       return false;
     }
   };
 
   const logout = () => {
+    authApi.logout().catch(console.error); // Fire and forget
     setAuthState({ user: null, isLoading: false, error: null });
     localStorage.removeItem("careerlink_user");
   };
@@ -155,6 +97,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const refreshUser = async () => {
+    try {
+      const response = await authApi.verifySession();
+      if (response.data) {
+        setAuthState((prev) => ({ ...prev, user: response.data }));
+      } else {
+        setAuthState({ user: null, isLoading: false, error: null });
+        localStorage.removeItem("careerlink_user");
+      }
+    } catch (error) {
+      console.error("Failed to refresh user session:", error);
+      setAuthState({ user: null, isLoading: false, error: null });
+      localStorage.removeItem("careerlink_user");
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -163,6 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loginWithMicrosoft,
         logout,
         setUser,
+        refreshUser,
       }}
     >
       {children}

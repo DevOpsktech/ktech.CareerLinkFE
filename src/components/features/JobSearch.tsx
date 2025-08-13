@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Search, MapPin, Clock, DollarSign, Building } from "lucide-react";
 import { Button } from "../ui/Button";
-import { jobs } from "../../constants";
+import { useJobs } from "../../hooks/useJobs";
+import { useAuth } from "../../contexts/AuthContext";
+import { useApplications } from "../../hooks/useApllications";
+import type { JobSearchFilters } from "../../types/job";
 
 export function JobSearch() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -11,10 +14,86 @@ export function JobSearch() {
     company: "",
   });
 
+  const { user } = useAuth();
+  const { jobs, loading, error, fetchJobs, pagination } = useJobs();
+  const { applyToJob, loading: applyingToJob } = useApplications();
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Searching for:", searchQuery, filters);
+
+    const searchFilters: JobSearchFilters = {
+      query: searchQuery || undefined,
+      location: filters.location || undefined,
+      jobType: filters.jobType || undefined,
+      company: filters.company || undefined,
+      page: 1,
+    };
+
+    fetchJobs(searchFilters);
   };
+
+  const handleApplyToJob = async (jobId: string) => {
+    if (!user || user.role !== "student") return;
+
+    const application = await applyToJob(jobId, user.id, {
+      coverLetter: "I am interested in this position and would like to apply.",
+    });
+
+    if (application) {
+      alert("Application submitted successfully!");
+    }
+  };
+
+  const formatSalary = (job: any) => {
+    if (!job.salary) return "Salary not specified";
+
+    const { min, max, currency, period } = job.salary;
+    const formatAmount = (amount: number) => {
+      if (period === "hourly") return `$${amount}`;
+      return `$${amount.toLocaleString()}`;
+    };
+
+    if (min && max) {
+      return `${formatAmount(min)} - ${formatAmount(max)}${
+        period === "hourly" ? "/hour" : period === "yearly" ? "/year" : "/month"
+      }`;
+    } else if (min) {
+      return `From ${formatAmount(min)}${
+        period === "hourly" ? "/hour" : period === "yearly" ? "/year" : "/month"
+      }`;
+    }
+    return "Competitive salary";
+  };
+
+  const formatJobType = (type: string) => {
+    return type
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  const formatPostedDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 1) return "1 day ago";
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
+    return `${Math.ceil(diffDays / 30)} months ago`;
+  };
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-600 mb-4">Error loading jobs: {error}</p>
+        <Button onClick={() => fetchJobs()} variant="primary">
+          Try Again
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -104,64 +183,114 @@ export function JobSearch() {
       </div>
 
       {/* Job Listings */}
-      <div className="space-y-4">
-        {jobs.map((job) => (
-          <div
-            key={job.id}
-            className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow border border-gray-100"
-          >
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {job.title}
-                </h3>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
-                  <div className="flex items-center">
-                    <Building size={16} className="mr-1" />
-                    {job.company}
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading jobs...</p>
+        </div>
+      ) : jobs.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-gray-600">No jobs found matching your criteria.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {jobs.map((job) => (
+            <div
+              key={job.id}
+              className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow border border-gray-100"
+            >
+              <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    {job.title}
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
+                    <div className="flex items-center">
+                      <Building size={16} className="mr-1" />
+                      {job.company}
+                    </div>
+                    <div className="flex items-center">
+                      <MapPin size={16} className="mr-1" />
+                      {job.location}
+                    </div>
+                    <div className="flex items-center">
+                      <Clock size={16} className="mr-1" />
+                      {formatJobType(job.type)}
+                    </div>
+                    <div className="flex items-center">
+                      <DollarSign size={16} className="mr-1" />
+                      {formatSalary(job)}
+                    </div>
                   </div>
-                  <div className="flex items-center">
-                    <MapPin size={16} className="mr-1" />
-                    {job.location}
+                  <p className="text-gray-700 mb-3">{job.description}</p>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {job.skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="px-3 py-1 bg-teal-100 text-teal-700 text-sm rounded-full"
+                      >
+                        {skill}
+                      </span>
+                    ))}
                   </div>
-                  <div className="flex items-center">
-                    <Clock size={16} className="mr-1" />
-                    {job.type}
-                  </div>
-                  <div className="flex items-center">
-                    <DollarSign size={16} className="mr-1" />
-                    {job.salary}
-                  </div>
+                  <p className="text-xs text-gray-500">
+                    Posted {formatPostedDate(job.postedDate)}
+                  </p>
                 </div>
-                <p className="text-gray-700 mb-3">{job.description}</p>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {job.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-3 py-1 bg-teal-100 text-teal-700 text-sm rounded-full"
-                    >
-                      {skill}
-                    </span>
-                  ))}
+                <div className="mt-4 md:mt-0 md:ml-6 flex-shrink-0">
+                  <Button
+                    variant="secondary"
+                    size="md"
+                    onClick={() => handleApplyToJob(job.id)}
+                    disabled={applyingToJob || user?.role !== "student"}
+                  >
+                    {applyingToJob ? "Applying..." : "Apply Now"}
+                  </Button>
                 </div>
-                <p className="text-xs text-gray-500">Posted {job.posted}</p>
-              </div>
-              <div className="mt-4 md:mt-0 md:ml-6 flex-shrink-0">
-                <Button variant="secondary" size="md">
-                  Apply Now
-                </Button>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Load More */}
-      <div className="text-center pt-6">
-        <Button variant="outline" size="lg">
-          Load More Jobs
-        </Button>
-      </div>
+      {pagination.totalPages > 1 && (
+        <div className="text-center pt-6">
+          <div className="flex justify-center items-center space-x-4">
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() =>
+                fetchJobs({
+                  ...filters,
+                  query: searchQuery,
+                  page: pagination.page - 1,
+                })
+              }
+              disabled={pagination.page <= 1 || loading}
+            >
+              Previous
+            </Button>
+            <span className="text-sm text-gray-600">
+              Page {pagination.page} of {pagination.totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() =>
+                fetchJobs({
+                  ...filters,
+                  query: searchQuery,
+                  page: pagination.page + 1,
+                })
+              }
+              disabled={pagination.page >= pagination.totalPages || loading}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
