@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { JobSearch } from "../features/JobSearch";
 import { User, Search, Bookmark } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
@@ -6,6 +6,7 @@ import { useApplications } from "../../hooks/useApllications";
 import { ProfileForm } from "../forms/profile/ProfileForm";
 import Heading from "../ui/Heading";
 import Tabs from "../ui/Tabs";
+import { getStatusColor } from "../../utils/reusables";
 
 export function StudentDashboard() {
   const [activeTab, setActiveTab] = useState("jobs");
@@ -20,31 +21,6 @@ export function StudentDashboard() {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "reviewing":
-        return "bg-blue-100 text-blue-800";
-      case "shortlisted":
-        return "bg-green-100 text-green-800";
-      case "interview_scheduled":
-        return "bg-purple-100 text-purple-800";
-      case "interviewed":
-        return "bg-indigo-100 text-indigo-800";
-      case "offered":
-        return "bg-green-100 text-green-800";
-      case "accepted":
-        return "bg-green-100 text-green-800";
-      case "rejected":
-        return "bg-red-100 text-red-800";
-      case "withdrawn":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
   };
 
   const formatStatus = (status: string) => {
