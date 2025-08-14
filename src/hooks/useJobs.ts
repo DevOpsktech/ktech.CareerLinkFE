@@ -86,6 +86,7 @@ export const useJobs = (filters: JobSearchFilters = {}) => {
 
   useEffect(() => {
     fetchJobs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
@@ -125,6 +126,7 @@ export const useJob = (id: string) => {
 
   useEffect(() => {
     fetchJob();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   return {

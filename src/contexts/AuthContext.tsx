@@ -31,6 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const user = JSON.parse(savedUser);
         setAuthState((prev) => ({ ...prev, user }));
       } catch (error) {
+        console.log("Error parsing user data from localStorage:", error);
         localStorage.removeItem("careerlink_user");
       }
     }
@@ -129,6 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

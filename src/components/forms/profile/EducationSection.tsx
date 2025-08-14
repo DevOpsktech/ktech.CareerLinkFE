@@ -1,6 +1,7 @@
 import React from "react";
 
 interface EducationSectionProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   formData: any;
   onChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>

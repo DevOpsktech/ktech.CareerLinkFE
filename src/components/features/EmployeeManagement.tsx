@@ -4,7 +4,7 @@ import { DataTable } from "../ui/DataTable";
 import { Button } from "../ui/Button";
 import { CreateEmployerModal } from "../modals/job-post-Form/CreateEmployeeModal";
 import { Plus, Search, Building2, Mail, Phone, MapPin } from "lucide-react";
-import type { Employer } from "../../types/employer";
+import type { CreateEmployerRequest, Employer } from "../../types/employer";
 
 export function EmployerManagement() {
   const { employers, loading, error, createEmployer, deleteEmployer } =
@@ -109,7 +109,7 @@ export function EmployerManagement() {
     },
   ];
 
-  const handleCreateEmployer = async (employerData: any) => {
+  const handleCreateEmployer = async (employerData: CreateEmployerRequest) => {
     try {
       await createEmployer(employerData);
       setIsCreateModalOpen(false);

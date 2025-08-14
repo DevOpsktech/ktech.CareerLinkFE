@@ -16,5 +16,6 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
 export interface ApiError {
   message: string;
   code?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   details?: any;
 }

@@ -2,6 +2,7 @@ import { AlertCircle, ArrowLeft } from "lucide-react";
 import { Button } from "../ui/Button";
 import { useNavigate } from "react-router-dom";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const JobNotFound = ({ error }: { error?: any }) => {
   const navigate = useNavigate();
   return (

@@ -5,11 +5,13 @@ import { useNavigate } from "react-router-dom";
 interface Column {
   key: string;
   label: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   render?: (row: any) => React.ReactNode; // Add render function support
 }
 
 interface DataTableProps {
   columns: Column[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any[];
   showActions?: boolean;
   employerActions?: boolean;

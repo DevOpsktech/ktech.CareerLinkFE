@@ -3,6 +3,7 @@ import { X, Upload, FileText, AlertCircle } from "lucide-react";
 import { Button } from "../../ui/Button";
 
 interface JobApplicationModalProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   job: any;
   onClose: () => void;
   onSubmit: (data: { coverLetter: string; resumeUrl?: string }) => void;

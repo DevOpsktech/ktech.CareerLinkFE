@@ -30,6 +30,7 @@ export interface JobApplication {
   jobId: string;
   studentId: string;
   job?: Job;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   student?: any;
   coverLetter?: string;
   resumeUrl?: string;

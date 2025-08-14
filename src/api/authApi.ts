@@ -91,16 +91,13 @@ export const authApi = {
   },
 
   // Change password
-  changePassword: async (
-    currentPassword: string,
-    newPassword: string
-  ): Promise<ApiResponse<boolean>> => {
+  changePassword: async (): Promise<ApiResponse<boolean>> => {
     // Mock password change
     return mockApiCall(true);
   },
 
   // Reset password
-  resetPassword: async (email: string): Promise<ApiResponse<boolean>> => {
+  resetPassword: async (): Promise<ApiResponse<boolean>> => {
     // Mock password reset
     return mockApiCall(true);
   },

@@ -13,6 +13,7 @@ import { Button } from "../../ui/Button";
 
 interface CreateEmployerModalProps {
   onClose: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSubmit: (data: any) => void;
 }
 

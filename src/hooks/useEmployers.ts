@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
-import type { CreateEmployerRequest, Employer, EmployerSearchFilters } from "../types/employer";
+import type {
+  CreateEmployerRequest,
+  Employer,
+  EmployerSearchFilters,
+} from "../types/employer";
 import type { PaginatedResponse } from "../types/api";
 import { employersApi } from "../api/employerApi";
 
@@ -97,6 +101,7 @@ export const useEmployers = (filters: EmployerSearchFilters = {}) => {
 
   useEffect(() => {
     fetchEmployers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
@@ -137,6 +142,7 @@ export const useEmployer = (id?: string, userId?: string) => {
 
   useEffect(() => {
     fetchEmployer();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, userId]);
 
   return {
