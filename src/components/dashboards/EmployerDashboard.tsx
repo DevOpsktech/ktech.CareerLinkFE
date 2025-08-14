@@ -12,9 +12,13 @@ import {
 import { StudentTable } from "../ui/StudentTable";
 import Heading from "../ui/Heading";
 import Tabs from "../ui/Tabs";
+import { useJobs } from "../../hooks/useJobs";
+import Loader from "../ui/Loader";
 
 export function EmployerDashboard() {
   const [activeTab, setActiveTab] = useState("jobs");
+  const { jobs, loading } = useJobs();
+  console.log("Jobs in Employer Dashboard:", jobs);
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -22,7 +26,6 @@ export function EmployerDashboard() {
         title="Employer Dashboard"
         description="Manage your job postings and find talent"
       />
-
       {/* Tabs */}
       <Tabs
         tabs={tabs}
@@ -30,7 +33,6 @@ export function EmployerDashboard() {
         setActiveTab={setActiveTab}
         activeTabFor="employer"
       />
-
       {/* Tab Content */}
       <div>
         {activeTab === "jobs" && (
@@ -40,7 +42,17 @@ export function EmployerDashboard() {
                 My Job Postings
               </h2>
             </div>
-            <DataTable columns={myJobsColumns} data={myJobsData} showActions />
+            {loading ? (
+              <div className="text-center py-8">
+                <Loader text="Loading Jobs..." />
+              </div>
+            ) : (
+              <DataTable
+                columns={myJobsColumns}
+                data={myJobsData}
+                showActions
+              />
+            )}
           </div>
         )}
 

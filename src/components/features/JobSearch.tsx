@@ -1,12 +1,15 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, MapPin, Clock, DollarSign, Building } from "lucide-react";
 import { Button } from "../ui/Button";
 import { useJobs } from "../../hooks/useJobs";
 import { useAuth } from "../../contexts/AuthContext";
 import { useApplications } from "../../hooks/useApllications";
 import type { JobSearchFilters } from "../../types/job";
+import Loader from "../ui/Loader";
 
 export function JobSearch() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
     location: "",
@@ -47,10 +50,10 @@ export function JobSearch() {
   const formatSalary = (job: any) => {
     if (!job.salary) return "Salary not specified";
 
-    const { min, max, currency, period } = job.salary;
+    const { min, max, period } = job.salary;
     const formatAmount = (amount: number) => {
       if (period === "hourly") return `$${amount}`;
-      return `$${amount.toLocaleString()}`;
+      return `${amount.toLocaleString()}`;
     };
 
     if (min && max) {
@@ -185,8 +188,7 @@ export function JobSearch() {
       {/* Job Listings */}
       {loading ? (
         <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading jobs...</p>
+          <Loader text="Loading jobs..." />
         </div>
       ) : jobs.length === 0 ? (
         <div className="text-center py-8">
@@ -238,14 +240,27 @@ export function JobSearch() {
                   </p>
                 </div>
                 <div className="mt-4 md:mt-0 md:ml-6 flex-shrink-0">
-                  <Button
-                    variant="secondary"
-                    size="md"
-                    onClick={() => handleApplyToJob(job.id)}
-                    disabled={applyingToJob || user?.role !== "student"}
-                  >
-                    {applyingToJob ? "Applying..." : "Apply Now"}
-                  </Button>
+                  <div className="space-y-2 ">
+                    <Button
+                      variant="outline"
+                      size="md"
+                      onClick={() => navigate(`/jobs/${job.id}`)}
+                      className="w-full md:w-auto mr-2"
+                    >
+                      View Details
+                    </Button>
+                    {user?.role === "student" && (
+                      <Button
+                        variant="secondary"
+                        size="md"
+                        onClick={() => handleApplyToJob(job.id)}
+                        disabled={applyingToJob}
+                        className="w-full md:w-auto"
+                      >
+                        {applyingToJob ? "Applying..." : "Quick Apply"}
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

@@ -86,7 +86,7 @@ export const mockEmployers: Employer[] = [
 
 export const mockJobs: Job[] = [
   {
-    id: "job-1",
+    id: "1",
     title: "Software Engineering Intern",
     company: "TechCorp",
     companyId: "comp-1",
@@ -118,7 +118,7 @@ export const mockJobs: Job[] = [
     isRemote: false,
   },
   {
-    id: "job-2",
+    id: "2",
     title: "Financial Analyst",
     company: "FinanceInc",
     companyId: "comp-2",
@@ -150,7 +150,7 @@ export const mockJobs: Job[] = [
     isRemote: false,
   },
   {
-    id: "job-3",
+    id: "3",
     title: "UX Design Intern",
     company: "TechCorp",
     companyId: "comp-1",

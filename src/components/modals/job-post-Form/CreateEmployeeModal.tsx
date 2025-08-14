@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { X, Building, Mail, Tag, Lock, Eye, EyeOff } from "lucide-react";
+import {
+  X,
+  Building,
+  Mail,
+  Tag,
+  Lock,
+  Eye,
+  EyeOff,
+  PersonStanding,
+} from "lucide-react";
 import { Button } from "../../ui/Button";
 
 interface CreateEmployerModalProps {
@@ -13,6 +22,8 @@ export function CreateEmployerModal({
 }: CreateEmployerModalProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
+    name: "",
+    position: "",
     company: "",
     email: "",
     industry: "",
@@ -87,6 +98,63 @@ export function CreateEmployerModal({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {" "}
+          <div>
+            <label
+              htmlFor="employerName"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Employer Name *
+            </label>
+            <div className="relative">
+              <PersonStanding
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={18}
+              />
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                  errors.name ? "border-red-300" : "border-gray-300"
+                }`}
+                placeholder="Enter employer name"
+              />
+            </div>
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-600">{errors.company}</p>
+            )}
+          </div>{" "}
+          <div>
+            <label
+              htmlFor="position"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Employer Position *
+            </label>
+            <div className="relative">
+              <Building
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={18}
+              />
+              <input
+                type="text"
+                id="position"
+                name="position"
+                value={formData.position}
+                onChange={handleChange}
+                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                  errors.position ? "border-red-300" : "border-gray-300"
+                }`}
+                placeholder="Enter employer position"
+              />
+            </div>
+            {errors.position && (
+              <p className="mt-1 text-sm text-red-600">{errors.company}</p>
+            )}
+          </div>
           <div>
             <label
               htmlFor="company"
@@ -115,7 +183,6 @@ export function CreateEmployerModal({
               <p className="mt-1 text-sm text-red-600">{errors.company}</p>
             )}
           </div>
-
           <div>
             <label
               htmlFor="email"
@@ -144,7 +211,6 @@ export function CreateEmployerModal({
               <p className="mt-1 text-sm text-red-600">{errors.email}</p>
             )}
           </div>
-
           <div>
             <label
               htmlFor="industry"
@@ -181,7 +247,6 @@ export function CreateEmployerModal({
               <p className="mt-1 text-sm text-red-600">{errors.industry}</p>
             )}
           </div>
-
           <div>
             <div className="flex items-center justify-between mb-2">
               <label
@@ -226,7 +291,6 @@ export function CreateEmployerModal({
               <p className="mt-1 text-sm text-red-600">{errors.password}</p>
             )}
           </div>
-
           <div>
             <label
               htmlFor="confirmPassword"
@@ -257,7 +321,6 @@ export function CreateEmployerModal({
               </p>
             )}
           </div>
-
           <div className="bg-blue-50 p-4 rounded-lg">
             <h4 className="text-sm font-medium text-blue-800 mb-2">
               Account Setup
@@ -268,7 +331,6 @@ export function CreateEmployerModal({
               <li>• Account will be active immediately after creation</li>
             </ul>
           </div>
-
           <div className="flex space-x-3 pt-4">
             <Button
               type="button"

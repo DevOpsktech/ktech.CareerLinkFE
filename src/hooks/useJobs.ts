@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { jobsApi } from "../api/jobsApi";
 import type { PaginatedResponse } from "../types/api";
 import type { CreateJobRequest, Job, JobSearchFilters } from "../types/job";
+
 export const useJobs = (filters: JobSearchFilters = {}) => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(false);
@@ -116,6 +117,7 @@ export const useJob = (id: string) => {
       setJob(response.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch job");
+      setJob(null);
     } finally {
       setLoading(false);
     }

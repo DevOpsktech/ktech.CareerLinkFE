@@ -3,6 +3,7 @@ import { Search, Filter, Download, Star } from "lucide-react";
 import { Button } from "../ui/Button";
 import { useStudents } from "../../hooks/useStudents";
 import type { StudentSearchFilters } from "../../types/student";
+import Loader from "../ui/Loader";
 
 export function StudentSearch() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -164,8 +165,7 @@ export function StudentSearch() {
 
         {loading ? (
           <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading students...</p>
+            <Loader text="Loading students..." />
           </div>
         ) : students.length === 0 ? (
           <div className="text-center py-8">

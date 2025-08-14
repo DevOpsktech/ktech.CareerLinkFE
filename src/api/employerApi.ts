@@ -1,10 +1,14 @@
 import { mockCompanies, mockEmployers } from "../constants/mockData";
 import type { ApiResponse, PaginatedResponse } from "../types/api";
-import type { CreateEmployerRequest, Employer, EmployerSearchFilters } from "../types/employer";
+import type {
+  CreateEmployerRequest,
+  Employer,
+  EmployerSearchFilters,
+} from "../types/employer";
 import { mockApiCall } from "../utils/api";
 
 // Mock employer storage
-let employers = [...mockEmployers];
+const employers = [...mockEmployers];
 
 export const employersApi = {
   // Get all employers with filters

@@ -5,6 +5,7 @@ import { Navigation } from "./components/Navigation";
 import { AdminDashboard } from "./components/dashboards/AdminDashboard";
 import { EmployerDashboard } from "./components/dashboards/EmployerDashboard";
 import { StudentDashboard } from "./components/dashboards/StudentDashboard";
+import JobDetailPage from "./components/pages/JobDetailPage";
 function AppContent() {
   const { user } = useAuth();
 
@@ -38,8 +39,13 @@ function AppContent() {
 
           {/* Student Routes */}
           {(user.role === "student" || user.role === "admin") && (
-            <Route path="/student" element={<StudentDashboard />} />
+            <>
+              <Route path="/student" element={<StudentDashboard />} />
+              <Route path="/jobs/:id" element={<JobDetailPage />} />
+            </>
           )}
+
+          <Route path="/jobs/:id" element={<JobDetailPage />} />
 
           {/* Default redirects based on user role */}
           <Route

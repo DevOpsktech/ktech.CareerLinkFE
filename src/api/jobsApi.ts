@@ -1,12 +1,16 @@
 import { mockApplications, mockJobs } from "../constants/mockData";
 import type { ApiResponse, PaginatedResponse } from "../types/api";
-import type { CreateJobRequest, Job, JobApplication, JobSearchFilters } from "../types/job";
+import type {
+  CreateJobRequest,
+  Job,
+  JobApplication,
+  JobSearchFilters,
+} from "../types/job";
 import { mockApiCall } from "../utils/api";
 
-
 // Mock job storage
-let jobs = [...mockJobs];
-let applications = [...mockApplications];
+const jobs = [...mockJobs];
+const applications = [...mockApplications];
 
 export const jobsApi = {
   // Get all jobs with filters
@@ -23,7 +27,9 @@ export const jobsApi = {
           job.title.toLowerCase().includes(query) ||
           job.company.toLowerCase().includes(query) ||
           job.description.toLowerCase().includes(query) ||
-          job.skills.some((skill: string) => skill.toLowerCase().includes(query))
+          job.skills.some((skill: string) =>
+            skill.toLowerCase().includes(query)
+          )
       );
     }
 
