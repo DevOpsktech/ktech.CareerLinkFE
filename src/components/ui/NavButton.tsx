@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const NavButton = ({ active, label, Icon, color, onClick }: any) => (
   <button
     onClick={onClick}

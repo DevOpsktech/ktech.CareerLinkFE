@@ -1,10 +1,14 @@
 import { mockStudents } from "../constants/mockData";
 import type { ApiResponse, PaginatedResponse } from "../types/api";
-import type { Student, StudentSearchFilters, UpdateStudentProfileRequest } from "../types/student";
+import type {
+  Student,
+  StudentSearchFilters,
+  UpdateStudentProfileRequest,
+} from "../types/student";
 import { mockApiCall } from "../utils/api";
 
 // Mock student storage
-let students = [...mockStudents];
+const students = [...mockStudents];
 
 export const studentsApi = {
   // Get all students with filters
@@ -21,7 +25,7 @@ export const studentsApi = {
           student.name.toLowerCase().includes(query) ||
           student.email.toLowerCase().includes(query) ||
           student.major?.toLowerCase().includes(query) ||
-          student.skills.some((skill: any) =>
+          student.skills.some((skill: { skillName: string }) =>
             skill.skillName.toLowerCase().includes(query)
           )
       );

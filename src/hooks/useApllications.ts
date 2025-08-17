@@ -84,6 +84,7 @@ export const useApplications = (studentId?: string, jobId?: string) => {
 
   useEffect(() => {
     fetchApplications();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [studentId, jobId]);
 
   return {

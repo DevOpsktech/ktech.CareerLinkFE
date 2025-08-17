@@ -47,6 +47,7 @@ export function JobSearch() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const formatSalary = (job: any) => {
     if (!job.salary) return "Salary not specified";
 

@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { studentsApi } from "../api/studentsApi";
-import type { Student, StudentSearchFilters, UpdateStudentProfileRequest } from "../types/student";
+import type {
+  Student,
+  StudentSearchFilters,
+  UpdateStudentProfileRequest,
+} from "../types/student";
 import type { PaginatedResponse } from "../types/api";
 
 export const useStudents = (filters: StudentSearchFilters = {}) => {
@@ -36,6 +40,7 @@ export const useStudents = (filters: StudentSearchFilters = {}) => {
 
   useEffect(() => {
     fetchStudents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
@@ -163,6 +168,7 @@ export const useStudent = (id?: string, userId?: string) => {
 
   useEffect(() => {
     fetchStudent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, userId]);
 
   return {

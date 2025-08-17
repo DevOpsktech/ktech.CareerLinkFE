@@ -33,6 +33,7 @@ export function StudentSearch() {
     fetchStudents(searchFilters);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleDownloadCV = (student: any) => {
     if (student.cvUrl) {
       window.open(student.cvUrl, "_blank");
@@ -41,6 +42,7 @@ export function StudentSearch() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleShortlist = (student: any) => {
     // This would typically call an API to add to shortlist
     alert(`${student.name} has been added to your shortlist!`);
