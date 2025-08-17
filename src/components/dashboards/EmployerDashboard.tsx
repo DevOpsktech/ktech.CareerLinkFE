@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { JobPostingForm } from "../forms/JobPostingForm";
 import { DataTable } from "../ui/DataTable";
 import { StudentSearch } from "../features/StudentSearch";
 import {
@@ -14,6 +13,7 @@ import Heading from "../ui/Heading";
 import Tabs from "../ui/Tabs";
 import { useJobs } from "../../hooks/useJobs";
 import Loader from "../ui/Loader";
+import { JobPostingForm } from "../forms/job-posting-form/JobPostingForm";
 
 export function EmployerDashboard() {
   const [activeTab, setActiveTab] = useState("jobs");
