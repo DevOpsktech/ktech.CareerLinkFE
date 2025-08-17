@@ -36,6 +36,12 @@ export const authApi = {
           name: "Michael Chen",
           id: "emp-2",
         },
+        {
+          email: "recruiting@techcorp.com",
+          password: "rookie123",
+          name: "Emily Smith",
+          id: "emp-3",
+        },
       ];
 
       const employer = mockEmployers.find(

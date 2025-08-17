@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { JobSearch } from "../features/JobSearch";
 import { User, Search, Bookmark } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useApplications } from "../../hooks/useApllications";
@@ -8,6 +7,7 @@ import Heading from "../ui/Heading";
 import Tabs from "../ui/Tabs";
 import { getStatusColor } from "../../utils/reusables";
 import Loader from "../ui/Loader";
+import { JobSearch } from "../features/job-search/JobSearch";
 
 export function StudentDashboard() {
   const [activeTab, setActiveTab] = useState("jobs");

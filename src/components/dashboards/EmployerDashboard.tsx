@@ -75,6 +75,7 @@ export function EmployerDashboard() {
             <StudentTable
               columns={studentColumns}
               data={studentData}
+              onViewCv={(cvUrl) => window.open(cvUrl, "_blank")}
               actions={true}
             />
           </div>

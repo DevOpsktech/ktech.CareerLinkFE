@@ -82,6 +82,18 @@ export const mockEmployers: Employer[] = [
     createdAt: "2024-01-01T00:00:00Z",
     updatedAt: "2024-01-01T00:00:00Z",
   },
+  {
+    id: "emp-3",
+    userId: "user-emp-3",
+    companyId: "comp-3",
+    name: "Emily Davis",
+    email: "recruiting@healthcare-ltd.com",
+    position: "Recruiting Manager",
+    phone: "+1-555-0103",
+    company: mockCompanies[2],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+  },
 ];
 
 export const mockJobs: Job[] = [
@@ -208,6 +220,7 @@ export const mockStudents: Student[] = [
     portfolioUrl: "https://alicejohnson.dev",
     linkedinUrl: "https://linkedin.com/in/alicejohnson",
     githubUrl: "https://github.com/alicejohnson",
+    cvUrl: "./careerlink.pdf",
     skills: [
       {
         id: "skill-1",
@@ -264,6 +277,7 @@ export const mockStudents: Student[] = [
     gpa: 3.6,
     bio: "Business student with strong analytical skills and interest in project management.",
     linkedinUrl: "https://linkedin.com/in/bobchen",
+    cvUrl: "./careerlink.pdf",
     skills: [
       {
         id: "skill-4",
