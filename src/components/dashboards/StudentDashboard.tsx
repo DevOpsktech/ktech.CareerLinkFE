@@ -5,7 +5,11 @@ import { useApplications } from "../../hooks/useApllications";
 import { ProfileForm } from "../forms/profile/ProfileForm";
 import Heading from "../ui/Heading";
 import Tabs from "../ui/Tabs";
-import { getStatusColor } from "../../utils/reusables";
+import {
+  formatDate,
+  formatStatus,
+  getStatusColor,
+} from "../../utils/reusables";
 import Loader from "../ui/Loader";
 import { JobSearch } from "../features/job-search/JobSearch";
 
@@ -19,17 +23,6 @@ export function StudentDashboard() {
     { key: "applied", label: "Applied Jobs", icon: Bookmark },
     { key: "profile", label: "Profile", icon: User },
   ];
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
-
-  const formatStatus = (status: string) => {
-    return status
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">

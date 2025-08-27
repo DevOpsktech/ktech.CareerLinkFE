@@ -35,3 +35,14 @@ export const getRoleColor = (roleKey: string) => {
       return "from-gray-500 to-gray-600";
   }
 };
+
+export const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString();
+};
+
+export const formatStatus = (status: string) => {
+  return status
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
