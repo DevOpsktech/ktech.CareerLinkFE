@@ -34,7 +34,7 @@ export function JobList({
     );
   }
 
-  if (!jobs.length) {
+  if (jobs.length == 0 && !loading) {
     return (
       <div className="text-center py-8">
         <p className="text-gray-600">No jobs found.</p>

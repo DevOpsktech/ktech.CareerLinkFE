@@ -21,7 +21,12 @@ export default function JobHeader({
       <div className="flex flex-wrap items-center gap-6 text-gray-600 mb-4">
         <div className="flex items-center">
           <Building className="w-5 h-5 mr-2" />
-          <span className="font-medium">{job.company}</span>
+          <span className="font-medium">
+            {job.company?.name ||
+              job.company ||
+              job.employer?.company?.name ||
+              "Company"}
+          </span>
         </div>
         <div className="flex items-center">
           <MapPin className="w-5 h-5 mr-2" />

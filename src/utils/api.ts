@@ -1,6 +1,6 @@
 import type { ApiResponse } from "../types/api";
 
-const API_BASE_URL = "/api";
+const API_BASE_URL = "http://localhost:5000/api";
 const MOCK_DELAY = 800; // Simulate network delay
 
 // Simulate network delay
@@ -44,6 +44,7 @@ export class ApiClient {
           "Content-Type": "application/json",
           ...options.headers,
         },
+        credentials: "include",
         ...options,
       });
 

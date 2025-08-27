@@ -17,7 +17,7 @@ export const useApplications = (studentId?: string, jobId?: string) => {
       const response = studentId
         ? await jobsApi.getStudentApplications(studentId)
         : await jobsApi.getJobApplications(jobId!);
-      setApplications(response.data);
+      setApplications(response.$values);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch applications"

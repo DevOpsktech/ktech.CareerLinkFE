@@ -1,10 +1,43 @@
 import { DataTable } from "../ui/DataTable";
 import { StatCard } from "../ui/StatsCard";
 import { EmployerManagement } from "../features/EmployeeManagement";
-import { jobColumns, jobData, stats } from "../../constants";
+import { jobColumns, jobData } from "../../constants";
 import Heading from "../ui/Heading";
+import { useJobs } from "../../hooks/useJobs";
+import { useEmployers } from "../../hooks/useEmployers";
+import { useStudents } from "../../hooks/useStudents";
+import { Briefcase, GraduationCap, Users } from "lucide-react";
 
 export function AdminDashboard() {
+  const { jobs } = useJobs();
+  const { employers } = useEmployers();
+  const { students } = useStudents();
+
+  const totalJobs = jobs.length;
+  const totalEmployers = employers.length;
+  const totalStudents = students.length;
+
+  const stats = [
+    {
+      label: "Total Employers",
+      value: totalEmployers,
+      icon: Users,
+      color: "blue",
+    },
+    {
+      label: "Job Postings",
+      value: totalJobs,
+      icon: Briefcase,
+      color: "green",
+    },
+    {
+      label: "Students",
+      value: totalStudents,
+      icon: GraduationCap,
+      color: "purple",
+    },
+  ];
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <Heading

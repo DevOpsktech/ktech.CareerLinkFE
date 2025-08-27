@@ -151,7 +151,7 @@ export function StudentSearch() {
       <div className="bg-white rounded-xl shadow-sm">
         <div className="p-6 border-b border-gray-100 flex justify-between items-center">
           <h3 className="text-lg font-semibold text-gray-900">
-            Search Results ({pagination.total} students found)
+            {/* Search Results ({pagination.total} students found) */}
           </h3>
           <div className="flex items-center space-x-2">
             <Button variant="outline" size="sm">
@@ -213,7 +213,7 @@ export function StudentSearch() {
                       {student.graduationYear}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div className="flex flex-wrap gap-1">
+                      {/* <div className="flex flex-wrap gap-1">
                         {student.skills.slice(0, 3).map((skill) => (
                           <span
                             key={skill.id}
@@ -227,7 +227,7 @@ export function StudentSearch() {
                             +{student.skills.length - 3} more
                           </span>
                         )}
-                      </div>
+                      </div> */}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {student.gpa ? student.gpa.toFixed(1) : "N/A"}
@@ -258,7 +258,7 @@ export function StudentSearch() {
         )}
 
         {/* Pagination */}
-        {pagination.totalPages > 1 && (
+        {/* {pagination.totalPages > 1 && (
           <div className="px-6 py-4 border-t border-gray-100">
             <div className="flex justify-center items-center space-x-4">
               <Button
@@ -294,7 +294,7 @@ export function StudentSearch() {
               </Button>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

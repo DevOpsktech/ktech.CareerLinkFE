@@ -1,23 +1,48 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const formatSalary = (job: any) => {
-  if (!job.salary) return "Salary not specified";
+  const salary = job.salary;
+  const min = salary?.min ?? job.salaryMin;
+  const max = salary?.max ?? job.salaryMax;
+  const currency = salary?.currency ?? job.salaryCurrency ?? "USD";
+  const periodRaw = salary?.period ?? job.salaryPeriod;
+  if (min == null && max == null) return "Salary not specified";
 
-  const { min, max, period } = job.salary;
+  const period =
+    periodRaw === "hour"
+      ? "hourly"
+      : periodRaw === "year"
+      ? "yearly"
+      : periodRaw;
+
   const formatAmount = (amount: number) => {
-    if (period === "hourly") return `$${amount}`;
-    return `$${amount.toLocaleString()}`;
+    const symbol = currencySymbol(currency);
+    if (period === "hourly") return `${symbol}${amount}`;
+    return `${symbol}${amount.toLocaleString()}`;
   };
 
-  if (min && max) {
+  if (min != null && max != null) {
     return `${formatAmount(min)} - ${formatAmount(max)}${
       period === "hourly" ? "/hour" : period === "yearly" ? "/year" : "/month"
     }`;
-  } else if (min) {
+  } else if (min != null) {
     return `From ${formatAmount(min)}${
       period === "hourly" ? "/hour" : period === "yearly" ? "/year" : "/month"
     }`;
   }
   return "Competitive salary";
+};
+
+const currencySymbol = (code: string) => {
+  switch (code) {
+    case "USD":
+      return "$";
+    case "EUR":
+      return "€";
+    case "GBP":
+      return "£";
+    default:
+      return "$";
+  }
 };
 
 export const formatJobType = (type: string) => {

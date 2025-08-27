@@ -13,6 +13,11 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
   };
 }
 
+export interface DotNetListResponse<T> {
+  $id: string;
+  $values: T[];
+}
+
 export interface ApiError {
   message: string;
   code?: string;

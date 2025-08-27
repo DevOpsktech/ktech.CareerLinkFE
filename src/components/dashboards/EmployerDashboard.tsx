@@ -5,7 +5,6 @@ import {
   myJobsColumns,
   myJobsData,
   studentColumns,
-  studentData,
   tabs,
 } from "../../constants";
 import { StudentTable } from "../ui/StudentTable";
@@ -14,11 +13,15 @@ import Tabs from "../ui/Tabs";
 import { useJobs } from "../../hooks/useJobs";
 import Loader from "../ui/Loader";
 import { JobPostingForm } from "../forms/job-posting-form/JobPostingForm";
+import { useApplications } from "../../hooks/useApllications";
+import { useAuth } from "../../contexts/AuthContext";
 
 export function EmployerDashboard() {
   const [activeTab, setActiveTab] = useState("jobs");
-  const { jobs, loading } = useJobs();
-  console.log("Jobs in Employer Dashboard:", jobs);
+  const { loading } = useJobs();
+  const { user } = useAuth();
+  const { applications } = useApplications(user?.id);
+  console.log("Applications:", applications);
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -74,7 +77,7 @@ export function EmployerDashboard() {
             </h2>
             <StudentTable
               columns={studentColumns}
-              data={studentData}
+              data={applications}
               onViewCv={(cvUrl) => window.open(cvUrl, "_blank")}
               actions={true}
             />

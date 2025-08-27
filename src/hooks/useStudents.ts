@@ -5,7 +5,7 @@ import type {
   StudentSearchFilters,
   UpdateStudentProfileRequest,
 } from "../types/student";
-import type { PaginatedResponse } from "../types/api";
+import type { DotNetListResponse, PaginatedResponse } from "../types/api";
 
 export const useStudents = (filters: StudentSearchFilters = {}) => {
   const [students, setStudents] = useState<Student[]>([]);
@@ -23,13 +23,13 @@ export const useStudents = (filters: StudentSearchFilters = {}) => {
     setError(null);
 
     try {
-      const response: PaginatedResponse<Student> =
+      const response: DotNetListResponse<Student> =
         await studentsApi.getStudents({
           ...filters,
           ...searchFilters,
         });
 
-      setStudents(response.data);
+      setStudents(response.$values);
       setPagination(response.pagination);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch students");

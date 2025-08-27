@@ -4,7 +4,7 @@ import type {
   Employer,
   EmployerSearchFilters,
 } from "../types/employer";
-import type { PaginatedResponse } from "../types/api";
+import type { DotNetListResponse, PaginatedResponse } from "../types/api";
 import { employersApi } from "../api/employerApi";
 
 export const useEmployers = (filters: EmployerSearchFilters = {}) => {
@@ -23,13 +23,13 @@ export const useEmployers = (filters: EmployerSearchFilters = {}) => {
     setError(null);
 
     try {
-      const response: PaginatedResponse<Employer> =
+      const response: DotNetListResponse<Employer> =
         await employersApi.getEmployers({
           ...filters,
           ...searchFilters,
         });
 
-      setEmployers(response.data);
+      setEmployers(response.$values);
       setPagination(response.pagination);
     } catch (err) {
       setError(

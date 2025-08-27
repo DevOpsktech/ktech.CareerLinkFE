@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useEmployers } from "../../hooks/useEmployers";
 import { DataTable } from "../ui/DataTable";
 import { Button } from "../ui/Button";
-import { CreateEmployerModal } from "../modals/job-post-Form/CreateEmployeeModal";
+import { CreateEmployerModal } from "../modals/job-post-Form/CreateEmployerModal";
 import { Plus, Search, Building2, Mail, Phone, MapPin } from "lucide-react";
 import type { CreateEmployerRequest, Employer } from "../../types/employer";
 

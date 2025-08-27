@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { jobsApi } from "../api/jobsApi";
-import type { PaginatedResponse } from "../types/api";
+import type { DotNetListResponse } from "../types/api";
 import type { CreateJobRequest, Job, JobSearchFilters } from "../types/job";
 
 export const useJobs = (filters: JobSearchFilters = {}) => {
@@ -19,13 +19,13 @@ export const useJobs = (filters: JobSearchFilters = {}) => {
     setError(null);
 
     try {
-      const response: PaginatedResponse<Job> = await jobsApi.getJobs({
+      const response: DotNetListResponse<Job> = await jobsApi.getJobs({
         ...filters,
         ...searchFilters,
       });
 
-      setJobs(response.data);
-      setPagination(response.pagination);
+      setJobs(response.$values);
+      // setPagination(response);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch jobs");
     } finally {
