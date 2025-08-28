@@ -30,6 +30,7 @@ export default function JobDetailPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { job, loading, error } = useJob(id!);
+
   const {
     applications,
     applyToJob,
@@ -116,14 +117,14 @@ export default function JobDetailPage() {
 
           {/* Skills */}
           <div className="flex flex-wrap gap-2">
-            {job.skills.map((skill) => (
+            {/* {job.skills.map((skill) => (
               <span
                 key={skill}
                 className="px-3 py-1 bg-teal-100 text-teal-700 text-sm rounded-full"
               >
                 {skill}
               </span>
-            ))}
+            ))} */}
           </div>
         </div>
 

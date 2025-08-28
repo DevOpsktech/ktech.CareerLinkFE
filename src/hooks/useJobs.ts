@@ -115,7 +115,7 @@ export const useJob = (id: string) => {
 
     try {
       const response = await jobsApi.getJobById(id);
-      setJob(response.data);
+      setJob(response);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch job");
       setJob(null);
