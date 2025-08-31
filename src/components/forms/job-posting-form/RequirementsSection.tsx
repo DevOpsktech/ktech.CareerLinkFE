@@ -27,7 +27,7 @@ export function RequirementsSection({
         value={formData.requirements}
         onChange={onChange}
         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
-        placeholder="List the required qualifications, experience, and skills..."
+        placeholder="List the required qualifications, experience, and skills (comma-separated)..."
       />
     </div>
   );

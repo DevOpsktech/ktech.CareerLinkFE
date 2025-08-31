@@ -49,8 +49,16 @@ export function JobPostingForm() {
     const jobData: CreateJobRequest = {
       title: formData.title,
       description: formData.description,
-      requirements: formData.requirements,
-      responsibilities: formData.responsibilities,
+      requirements: formData.requirements
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s),
+      responsibilities: formData.responsibilities
+        ? formData.responsibilities
+            .split(",")
+            .map((s) => s.trim())
+            .filter((s) => s)
+        : undefined,
       salary:
         formData.salaryMin || formData.salaryMax
           ? {

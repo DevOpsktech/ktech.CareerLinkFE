@@ -85,3 +85,65 @@ export class ApiClient {
 }
 
 export const apiClient = new ApiClient();
+
+/**
+ * Cleans API response by removing $id properties and circular references
+ * This is needed for .NET JSON serialization responses
+ */
+export function cleanApiResponse<T>(data: any): T {
+  if (data === null || data === undefined) {
+    return data;
+  }
+
+  if (Array.isArray(data)) {
+    return data.map((item) => cleanApiResponse(item)) as T;
+  }
+
+  if (typeof data === "object") {
+    const cleaned: any = {};
+
+    for (const [key, value] of Object.entries(data)) {
+      // Skip $id properties
+      if (key === "$id" || key === "$ref") {
+        continue;
+      }
+
+      // Handle $values arrays
+      if (key === "$values" && Array.isArray(value)) {
+        return cleanApiResponse(value) as T;
+      }
+
+      // Recursively clean nested objects
+      cleaned[key] = cleanApiResponse(value);
+    }
+
+    return cleaned as T;
+  }
+
+  return data as T;
+}
+
+/**
+ * Transforms job data to match the expected format for components
+ */
+export function transformJobData(job: any) {
+  const cleaned = cleanApiResponse(job) as any;
+
+  return {
+    ...cleaned,
+    // Extract arrays from $values objects
+    requirements: cleaned.requirements?.$values || cleaned.requirements || [],
+    responsibilities:
+      cleaned.responsibilities?.$values || cleaned.responsibilities || [],
+    skills: cleaned.skills?.$values || cleaned.skills || [],
+    // Handle salary format
+    salary: {
+      min: cleaned.salaryMin,
+      max: cleaned.salaryMax,
+      currency: cleaned.salaryCurrency,
+      period: cleaned.salaryPeriod,
+    },
+    // Ensure company name is accessible
+    company: cleaned.company?.name || cleaned.company || "Company",
+  };
+}

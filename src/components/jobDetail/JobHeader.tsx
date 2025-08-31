@@ -15,18 +15,16 @@ export default function JobHeader({
   formatPostedDate,
   formatDeadline,
 }) {
+  // Handle both old and new company data formats
+  const companyName = job.company?.name || job.company || "Company";
+
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-4">{job.title}</h1>
       <div className="flex flex-wrap items-center gap-6 text-gray-600 mb-4">
         <div className="flex items-center">
           <Building className="w-5 h-5 mr-2" />
-          <span className="font-medium">
-            {job.company?.name ||
-              job.company ||
-              job.employer?.company?.name ||
-              "Company"}
-          </span>
+          <span className="font-medium">{companyName}</span>
         </div>
         <div className="flex items-center">
           <MapPin className="w-5 h-5 mr-2" />
@@ -52,14 +50,14 @@ export default function JobHeader({
           <Calendar className="w-4 h-4 mr-1" />
           Posted {formatPostedDate(job.postedDate)}
         </div>
-        <div className="flex items-center">
+        {/* <div className="flex items-center">
           <Users className="w-4 h-4 mr-1" />
           {job.applicationCount} applications
-        </div>
-        <div className="flex items-center">
+        </div> */}
+        {/* <div className="flex items-center">
           <Eye className="w-4 h-4 mr-1" />
           {job.viewCount} views
-        </div>
+        </div> */}
         {job.applicationDeadline && (
           <div className="flex items-center">
             <Clock className="w-4 h-4 mr-1" />

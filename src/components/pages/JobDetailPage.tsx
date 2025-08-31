@@ -102,7 +102,6 @@ export default function JobDetailPage() {
               formatPostedDate={formatPostedDate}
               formatSalary={formatSalary}
               job={job}
-              key={job.id}
             />
 
             {/* Apply Button */}
@@ -111,20 +110,20 @@ export default function JobDetailPage() {
               hasApplied={hasApplied}
               onApplyClick={() => setShowApplicationModal(true)}
               user={user}
-              key={user?.id || "apply-button"}
             />
           </div>
 
           {/* Skills */}
           <div className="flex flex-wrap gap-2">
-            {/* {job.skills.map((skill) => (
-              <span
-                key={skill}
-                className="px-3 py-1 bg-teal-100 text-teal-700 text-sm rounded-full"
-              >
-                {skill}
-              </span>
-            ))} */}
+            {job.skills &&
+              job.skills.map((skill: string, index: number) => (
+                <span
+                  key={`${job.id}-skill-${index}`}
+                  className="px-3 py-1 bg-teal-100 text-teal-700 text-sm rounded-full"
+                >
+                  {skill}
+                </span>
+              ))}
           </div>
         </div>
 
@@ -151,14 +150,13 @@ export default function JobDetailPage() {
               formatPostedDate={formatPostedDate}
               formatSalary={formatSalary}
               job={job}
-              key={job.id}
             />
 
             {/* Company Info */}
-            <CompanyInfo job={job} key={job.id} />
+            <CompanyInfo job={job} />
 
             {/* Share Job */}
-            <ShareJob job={job} key={job.id} />
+            <ShareJob job={job} />
           </div>
         </div>
       </div>
