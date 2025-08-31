@@ -1,110 +1,83 @@
 import type { ApiResponse } from "../types/api";
-import type { AuthUser } from "../types/auth";
-import { mockApiCall } from "../utils/api";
+import type {
+  AuthUser,
+  LoginCredentials,
+  RegisterCredentials,
+  UpdateCredentials,
+  LoginResponse,
+  RegisterResponse,
+} from "../types/auth";
+import { apiClient } from "../utils/api";
 
 export const authApi = {
-  // Admin/Employer login
+  // Register new user
+  register: async (
+    credentials: RegisterCredentials
+  ): Promise<ApiResponse<RegisterResponse>> => {
+    return apiClient.post<RegisterResponse>("/auth/register", credentials);
+  },
+
+  // Login user
   login: async (
-    email: string,
-    password: string,
-    role: "admin" | "employer"
-  ): Promise<ApiResponse<AuthUser>> => {
-    // Mock authentication logic
-    if (role === "admin") {
-      if (email === "admin@careerlink.com" && password === "admin123") {
-        const user: AuthUser = {
-          id: "admin-1",
-          email,
-          name: "System Administrator",
-          role: "admin",
-          isAuthenticated: true,
-        };
-        return mockApiCall(user);
-      }
-    } else if (role === "employer") {
-      // Mock employer validation
-      const mockEmployers = [
-        {
-          email: "hr@techcorp.com",
-          password: "tech123",
-          name: "Sarah Johnson",
-          id: "emp-1",
-        },
-        {
-          email: "careers@financeinc.com",
-          password: "finance123",
-          name: "Michael Chen",
-          id: "emp-2",
-        },
-        {
-          email: "recruiting@techcorp.com",
-          password: "rookie123",
-          name: "Emily Smith",
-          id: "emp-3",
-        },
-      ];
-
-      const employer = mockEmployers.find(
-        (emp) => emp.email === email && emp.password === password
-      );
-      if (employer) {
-        const user: AuthUser = {
-          id: employer.id,
-          email,
-          name: employer.name,
-          role: "employer",
-          isAuthenticated: true,
-        };
-        return mockApiCall(user);
-      }
-    }
-
-    throw new Error("Invalid credentials");
+    credentials: LoginCredentials
+  ): Promise<ApiResponse<LoginResponse>> => {
+    return apiClient.post<LoginResponse>("/auth/login", credentials);
   },
 
-  // Microsoft OAuth login for students
-  loginWithMicrosoft: async (): Promise<ApiResponse<AuthUser>> => {
-    // Mock successful OAuth response
-    const user: AuthUser = {
-      id: "student-1",
-      email: "student@university.edu",
-      name: "John Student",
-      role: "student",
-      isAuthenticated: true,
-    };
-
-    return mockApiCall(user);
+  // Get user profile
+  getProfile: async (): Promise<ApiResponse<AuthUser>> => {
+    return apiClient.get<AuthUser>("/auth/profile");
   },
 
-  // Logout
-  logout: async (): Promise<ApiResponse<boolean>> => {
-    return mockApiCall(true);
+  // Update user profile
+  updateProfile: async (
+    data: UpdateCredentials
+  ): Promise<ApiResponse<{ message: string }>> => {
+    return apiClient.put<{ message: string }>("/auth/update", data);
+  },
+
+  // Delete user profile
+  deleteProfile: async (): Promise<ApiResponse<{ message: string }>> => {
+    return apiClient.delete<{ message: string }>("/auth/delete");
   },
 
   // Verify token/session
   verifySession: async (): Promise<ApiResponse<AuthUser | null>> => {
-    const savedUser = localStorage.getItem("careerlink_user");
-    if (savedUser) {
-      try {
-        const user = JSON.parse(savedUser);
-        return mockApiCall(user);
-      } catch (error) {
-        console.error("Error parsing user data from localStorage:", error);
-        return mockApiCall(null);
-      }
+    try {
+      const response = await apiClient.get<AuthUser>("/auth/profile");
+      return response;
+    } catch (error) {
+      // If token is invalid or expired, return null
+      return { data: null, success: false, message: "Session expired" };
     }
-    return mockApiCall(null);
   },
 
-  // Change password
-  changePassword: async (): Promise<ApiResponse<boolean>> => {
-    // Mock password change
-    return mockApiCall(true);
+  // Store token in localStorage
+  storeToken: (token: string): void => {
+    localStorage.setItem("careerlink_token", token);
   },
 
-  // Reset password
-  resetPassword: async (): Promise<ApiResponse<boolean>> => {
-    // Mock password reset
-    return mockApiCall(true);
+  // Get token from localStorage
+  getToken: (): string | null => {
+    return localStorage.getItem("careerlink_token");
+  },
+
+  // Remove token from localStorage
+  removeToken: (): void => {
+    localStorage.removeItem("careerlink_token");
+  },
+
+  // Check if token is expired
+  isTokenExpired: (): boolean => {
+    const token = localStorage.getItem("careerlink_token");
+    if (!token) return true;
+
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const expirationTime = payload.exp * 1000; // Convert to milliseconds
+      return Date.now() >= expirationTime;
+    } catch (error) {
+      return true;
+    }
   },
 };

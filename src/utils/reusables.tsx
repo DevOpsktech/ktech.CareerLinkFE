@@ -25,11 +25,11 @@ export const getStatusColor = (status: string) => {
 
 export const getRoleColor = (roleKey: string) => {
   switch (roleKey) {
-    case "admin":
+    case "Admin":
       return "from-red-500 to-red-600";
-    case "employer":
+    case "Employer":
       return "from-blue-500 to-blue-600";
-    case "student":
+    case "Student":
       return "from-teal-500 to-teal-600";
     default:
       return "from-gray-500 to-gray-600";

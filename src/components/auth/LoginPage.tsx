@@ -6,10 +6,10 @@ import { EmployerLogin } from "./EmployerLogin";
 import { StudentLogin } from "./StudentLogin";
 import { Users, Briefcase, GraduationCap } from "lucide-react";
 
-type LoginRole = "admin" | "employer" | "student";
+type LoginRole = "Student" | "Employer" | "Admin";
 
 export function LoginPage() {
-  const [selectedRole, setSelectedRole] = useState<LoginRole>("student");
+  const [selectedRole, setSelectedRole] = useState<LoginRole>("Student");
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -17,9 +17,9 @@ export function LoginPage() {
   React.useEffect(() => {
     if (user?.isAuthenticated) {
       const redirectPath =
-        user.role === "admin"
+        user.role === "Admin"
           ? "/admin"
-          : user.role === "employer"
+          : user.role === "Employer"
           ? "/employer"
           : "/student";
       navigate(redirectPath, { replace: true });
@@ -28,19 +28,19 @@ export function LoginPage() {
 
   const roles = [
     {
-      key: "admin" as LoginRole,
+      key: "Admin" as LoginRole,
       label: "Administrator",
       icon: Users,
       color: "bg-red-500 hover:bg-red-600",
     },
     {
-      key: "employer" as LoginRole,
+      key: "Employer" as LoginRole,
       label: "Employer",
       icon: Briefcase,
       color: "bg-blue-500 hover:bg-blue-600",
     },
     {
-      key: "student" as LoginRole,
+      key: "Student" as LoginRole,
       label: "Student",
       icon: GraduationCap,
       color: "bg-teal-500 hover:bg-teal-600",
@@ -49,11 +49,11 @@ export function LoginPage() {
 
   const renderLoginForm = () => {
     switch (selectedRole) {
-      case "admin":
+      case "Admin":
         return <AdminLogin />;
-      case "employer":
+      case "Employer":
         return <EmployerLogin />;
-      case "student":
+      case "Student":
         return <StudentLogin />;
       default:
         return <StudentLogin />;

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { Button } from "../ui/Button";
-import { Briefcase, Mail, Lock, AlertCircle } from "lucide-react";
+import { Briefcase, Mail, Lock, AlertCircle, User } from "lucide-react";
 
 export function EmployerLogin() {
   const { login, isLoading, error } = useAuth();
@@ -10,15 +10,16 @@ export function EmployerLogin() {
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
+    fullName: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await login(
-      credentials.email,
-      credentials.password,
-      "employer"
-    );
+
+    const success = await login({
+      email: credentials.email,
+      password: credentials.password,
+    });
     if (success) {
       navigate("/employer", { replace: true });
     }
@@ -112,19 +113,9 @@ export function EmployerLogin() {
         </Button>
       </form>
 
-      <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-        <p className="text-xs text-blue-700 text-center font-medium mb-2">
-          Demo Employer Accounts:
-        </p>
-        <div className="space-y-1 text-xs text-blue-600">
-          <p>hr@techcorp.com / tech123</p>
-          <p>careers@financeinc.com / finance123</p>
-        </div>
-      </div>
-
       <div className="mt-4 text-center">
         <p className="text-xs text-gray-500">
-          Don't have an account? Contact your administrator to create one.
+          By signing in, you agree to our Terms of Service and Privacy Policy
         </p>
       </div>
     </div>

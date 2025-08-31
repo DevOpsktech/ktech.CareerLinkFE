@@ -4,7 +4,6 @@ import type {
   Employer,
   EmployerSearchFilters,
 } from "../types/employer";
-import type { DotNetListResponse, PaginatedResponse } from "../types/api";
 import { employersApi } from "../api/employerApi";
 
 export const useEmployers = (filters: EmployerSearchFilters = {}) => {
@@ -23,14 +22,37 @@ export const useEmployers = (filters: EmployerSearchFilters = {}) => {
     setError(null);
 
     try {
-      const response: DotNetListResponse<Employer> =
-        await employersApi.getEmployers({
-          ...filters,
-          ...searchFilters,
-        });
+      const response = await employersApi.getEmployers({
+        ...filters,
+        ...searchFilters,
+      });
 
-      setEmployers(response.$values);
-      setPagination(response.pagination);
+      // Handle the new API response structure
+      const responseData = response.data || response;
+
+      // Check if response is an array or has $values property
+      if (Array.isArray(responseData)) {
+        setEmployers(responseData);
+      } else if (
+        responseData &&
+        typeof responseData === "object" &&
+        "$values" in responseData
+      ) {
+        setEmployers((responseData as { $values: Employer[] }).$values);
+      } else {
+        setEmployers([]);
+      }
+
+      // Handle pagination if available
+      if (
+        responseData &&
+        typeof responseData === "object" &&
+        "pagination" in responseData
+      ) {
+        setPagination(
+          (responseData as { pagination: typeof pagination }).pagination
+        );
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch employers"
@@ -49,7 +71,8 @@ export const useEmployers = (filters: EmployerSearchFilters = {}) => {
     try {
       const response = await employersApi.createEmployer(employerData);
       await fetchEmployers(); // Refresh the list
-      return response.data;
+      const responseData = response.data || response;
+      return responseData as Employer;
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to create employer"
@@ -70,7 +93,8 @@ export const useEmployers = (filters: EmployerSearchFilters = {}) => {
     try {
       const response = await employersApi.updateEmployer(id, employerData);
       await fetchEmployers(); // Refresh the list
-      return response.data;
+      const responseData = response.data || response;
+      return responseData as Employer;
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to update employer"
@@ -132,7 +156,10 @@ export const useEmployer = (id?: string, userId?: string) => {
       const response = id
         ? await employersApi.getEmployerById(id)
         : await employersApi.getEmployerByUserId(userId!);
-      setEmployer(response.data);
+
+      // Handle the new API response structure
+      const responseData = response.data || response;
+      setEmployer(responseData as Employer);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch employer");
     } finally {

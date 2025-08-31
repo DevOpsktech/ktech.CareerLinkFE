@@ -5,7 +5,6 @@ import type {
   StudentSearchFilters,
   UpdateStudentProfileRequest,
 } from "../types/student";
-import type { DotNetListResponse, PaginatedResponse } from "../types/api";
 
 export const useStudents = (filters: StudentSearchFilters = {}) => {
   const [students, setStudents] = useState<Student[]>([]);
@@ -23,14 +22,37 @@ export const useStudents = (filters: StudentSearchFilters = {}) => {
     setError(null);
 
     try {
-      const response: DotNetListResponse<Student> =
-        await studentsApi.getStudents({
-          ...filters,
-          ...searchFilters,
-        });
+      const response = await studentsApi.getStudents({
+        ...filters,
+        ...searchFilters,
+      });
 
-      setStudents(response.$values);
-      setPagination(response.pagination);
+      // Handle the new API response structure
+      const responseData = response.data || response;
+
+      // Check if response is an array or has $values property
+      if (Array.isArray(responseData)) {
+        setStudents(responseData);
+      } else if (
+        responseData &&
+        typeof responseData === "object" &&
+        "$values" in responseData
+      ) {
+        setStudents((responseData as { $values: Student[] }).$values);
+      } else {
+        setStudents([]);
+      }
+
+      // Handle pagination if available
+      if (
+        responseData &&
+        typeof responseData === "object" &&
+        "pagination" in responseData
+      ) {
+        setPagination(
+          (responseData as { pagination: typeof pagination }).pagination
+        );
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch students");
     } finally {
@@ -68,7 +90,10 @@ export const useStudent = (id?: string, userId?: string) => {
       const response = id
         ? await studentsApi.getStudentById(id)
         : await studentsApi.getStudentByUserId(userId!);
-      setStudent(response.data);
+
+      // Handle the new API response structure
+      const responseData = response.data || response;
+      setStudent(responseData as Student);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch student");
     } finally {
@@ -89,8 +114,9 @@ export const useStudent = (id?: string, userId?: string) => {
         student.id,
         profileData
       );
-      setStudent(response.data);
-      return response.data;
+      const responseData = response.data || response;
+      setStudent(responseData as Student);
+      return responseData as Student;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update profile");
       return null;
@@ -112,7 +138,8 @@ export const useStudent = (id?: string, userId?: string) => {
 
     try {
       const response = await studentsApi.addStudentSkill(student.id, skillData);
-      setStudent(response.data);
+      const responseData = response.data || response;
+      setStudent(responseData as Student);
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add skill");
@@ -133,7 +160,8 @@ export const useStudent = (id?: string, userId?: string) => {
         student.id,
         skillId
       );
-      setStudent(response.data);
+      const responseData = response.data || response;
+      setStudent(responseData as Student);
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to remove skill");
@@ -156,7 +184,8 @@ export const useStudent = (id?: string, userId?: string) => {
         student.id,
         experienceData
       );
-      setStudent(response.data);
+      const responseData = response.data || response;
+      setStudent(responseData as Student);
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add experience");

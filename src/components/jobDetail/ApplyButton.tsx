@@ -7,7 +7,7 @@ export default function ApplyButton({
   applyingToJob,
   onApplyClick,
 }) {
-  if (user?.role !== "student") return null;
+  if (user?.role !== "Student") return null;
 
   return hasApplied ? (
     <div className="flex items-center text-green-600 bg-green-50 px-4 py-2 rounded-lg">

@@ -14,11 +14,10 @@ export function AdminLogin() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await login(
-      credentials.email,
-      credentials.password,
-      "admin"
-    );
+    const success = await login({
+      email: credentials.email,
+      password: credentials.password,
+    });
     if (success) {
       navigate("/admin", { replace: true });
     }
@@ -112,9 +111,9 @@ export function AdminLogin() {
         </Button>
       </form>
 
-      <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-        <p className="text-xs text-gray-600 text-center">
-          Demo credentials: admin@careerlink.com / admin123
+      <div className="mt-4 text-center">
+        <p className="text-xs text-gray-500">
+          Admin accounts must be created by system administrators
         </p>
       </div>
     </div>

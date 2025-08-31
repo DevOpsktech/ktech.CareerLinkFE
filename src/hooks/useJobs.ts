@@ -18,9 +18,9 @@ export const useJobs = (filters: JobSearchFilters = {}) => {
         ...searchFilters,
       });
 
-      // Clean and transform the response
-      const responseData = (response as any).data || response;
-      const cleanedJobs = cleanApiResponse(responseData).map(transformJobData);
+      // Handle the new API response structure
+      const responseData = response.data || response;
+      const cleanedJobs = cleanApiResponse(responseData as Job[]) as Job[];
       setJobs(cleanedJobs);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch jobs");
@@ -36,7 +36,7 @@ export const useJobs = (filters: JobSearchFilters = {}) => {
     try {
       const response = await jobsApi.createJob(jobData);
       await fetchJobs(); // Refresh the list
-      return transformJobData(response.data);
+      return transformJobData(response.data as Job);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create job");
       return null;
@@ -55,7 +55,7 @@ export const useJobs = (filters: JobSearchFilters = {}) => {
     try {
       const response = await jobsApi.updateJob(id, jobData);
       await fetchJobs(); // Refresh the list
-      return transformJobData(response.data);
+      return transformJobData(response.data as Job);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update job");
       return null;
@@ -110,9 +110,11 @@ export const useJob = (id: string) => {
 
     try {
       const response = await jobsApi.getJobById(id);
-      // Clean and transform the response
-      const responseData = (response as any).data || response;
-      const cleanedJob = transformJobData(cleanApiResponse(responseData));
+      // Handle the new API response structure
+      const responseData = response.data || response;
+      const cleanedJob = transformJobData(
+        cleanApiResponse(responseData as Job)
+      );
       setJob(cleanedJob);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch job");

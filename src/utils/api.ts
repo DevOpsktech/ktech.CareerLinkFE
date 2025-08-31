@@ -25,6 +25,11 @@ export const mockApiCall = async <T>(
   };
 };
 
+// Get JWT token from localStorage
+const getAuthToken = (): string | null => {
+  return localStorage.getItem("careerlink_token");
+};
+
 // HTTP client wrapper
 export class ApiClient {
   private baseURL: string;
@@ -39,21 +44,54 @@ export class ApiClient {
   ): Promise<ApiResponse<T>> {
     try {
       const url = `${this.baseURL}${endpoint}`;
+
+      // Get auth token
+      const token = getAuthToken();
+
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      // Add custom headers if provided
+      if (options.headers) {
+        Object.assign(headers, options.headers);
+      }
+
+      // Add Authorization header if token exists
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       const response = await fetch(url, {
-        headers: {
-          "Content-Type": "application/json",
-          ...options.headers,
-        },
+        headers,
         credentials: "include",
         ...options,
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
       }
 
-      const data = await response.json();
-      return data;
+      const responseData = await response.json();
+
+      // Check if the response already has the ApiResponse structure
+      if (
+        responseData &&
+        typeof responseData === "object" &&
+        "data" in responseData
+      ) {
+        return responseData as ApiResponse<T>;
+      }
+
+      // If not, wrap it in the ApiResponse structure
+      return {
+        data: responseData as T,
+        success: true,
+        message: "Success",
+      };
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : "Network error");
     }
@@ -63,16 +101,14 @@ export class ApiClient {
     return this.request<T>(endpoint, { method: "GET" });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async post<T>(endpoint: string, data: any): Promise<ApiResponse<T>> {
+  async post<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: "POST",
       body: JSON.stringify(data),
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async put<T>(endpoint: string, data: any): Promise<ApiResponse<T>> {
+  async put<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: "PUT",
       body: JSON.stringify(data),
@@ -90,9 +126,9 @@ export const apiClient = new ApiClient();
  * Cleans API response by removing $id properties and circular references
  * This is needed for .NET JSON serialization responses
  */
-export function cleanApiResponse<T>(data: any): T {
+export function cleanApiResponse<T>(data: unknown): T {
   if (data === null || data === undefined) {
-    return data;
+    return data as T;
   }
 
   if (Array.isArray(data)) {
@@ -100,9 +136,11 @@ export function cleanApiResponse<T>(data: any): T {
   }
 
   if (typeof data === "object") {
-    const cleaned: any = {};
+    const cleaned: Record<string, unknown> = {};
 
-    for (const [key, value] of Object.entries(data)) {
+    for (const [key, value] of Object.entries(
+      data as Record<string, unknown>
+    )) {
       // Skip $id properties
       if (key === "$id" || key === "$ref") {
         continue;
@@ -126,16 +164,24 @@ export function cleanApiResponse<T>(data: any): T {
 /**
  * Transforms job data to match the expected format for components
  */
-export function transformJobData(job: any) {
-  const cleaned = cleanApiResponse(job) as any;
+export function transformJobData(job: unknown) {
+  const cleaned = cleanApiResponse(job) as Record<string, unknown>;
 
   return {
     ...cleaned,
     // Extract arrays from $values objects
-    requirements: cleaned.requirements?.$values || cleaned.requirements || [],
+    requirements:
+      (cleaned.requirements as Record<string, unknown>)?.$values ||
+      cleaned.requirements ||
+      [],
     responsibilities:
-      cleaned.responsibilities?.$values || cleaned.responsibilities || [],
-    skills: cleaned.skills?.$values || cleaned.skills || [],
+      (cleaned.responsibilities as Record<string, unknown>)?.$values ||
+      cleaned.responsibilities ||
+      [],
+    skills:
+      (cleaned.skills as Record<string, unknown>)?.$values ||
+      cleaned.skills ||
+      [],
     // Handle salary format
     salary: {
       min: cleaned.salaryMin,
@@ -144,6 +190,9 @@ export function transformJobData(job: any) {
       period: cleaned.salaryPeriod,
     },
     // Ensure company name is accessible
-    company: cleaned.company?.name || cleaned.company || "Company",
+    company:
+      (cleaned.company as Record<string, unknown>)?.name ||
+      cleaned.company ||
+      "Company",
   };
 }

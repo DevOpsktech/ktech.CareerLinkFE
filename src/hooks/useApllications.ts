@@ -17,7 +17,24 @@ export const useApplications = (studentId?: string, jobId?: string) => {
       const response = studentId
         ? await jobsApi.getStudentApplications(studentId)
         : await jobsApi.getJobApplications(jobId!);
-      setApplications(response.$values);
+
+      // Handle the new API response structure
+      const responseData = response.data || response;
+
+      // Check if response is an array or has $values property
+      if (Array.isArray(responseData)) {
+        setApplications(responseData);
+      } else if (
+        responseData &&
+        typeof responseData === "object" &&
+        "$values" in responseData
+      ) {
+        setApplications(
+          (responseData as { $values: JobApplication[] }).$values
+        );
+      } else {
+        setApplications([]);
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch applications"
@@ -45,7 +62,8 @@ export const useApplications = (studentId?: string, jobId?: string) => {
         applicationData
       );
       await fetchApplications(); // Refresh the list
-      return response.data;
+      const responseData = response.data || response;
+      return responseData as JobApplication;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to apply to job");
       return null;
@@ -69,7 +87,8 @@ export const useApplications = (studentId?: string, jobId?: string) => {
         notes
       );
       await fetchApplications(); // Refresh the list
-      return response.data;
+      const responseData = response.data || response;
+      return responseData as JobApplication;
     } catch (err) {
       setError(
         err instanceof Error

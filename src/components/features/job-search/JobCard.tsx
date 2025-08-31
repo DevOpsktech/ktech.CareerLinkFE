@@ -178,7 +178,7 @@ export function JobCard({
           >
             View Details
           </Button>
-          {user?.role === "student" && (
+          {user?.role === "Student" && (
             <Button
               variant="secondary"
               size="md"

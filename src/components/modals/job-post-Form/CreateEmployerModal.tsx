@@ -153,14 +153,33 @@ export function CreateEmployerModal({
             error={errors.industry}
           />
 
-          <PasswordField
+          {/* <PasswordField
             value={formData.password}
             showPassword={showPassword}
             onToggleShowPassword={() => setShowPassword((prev) => !prev)}
             onGenerate={generatePassword}
+            label="password"
             onChange={handleChange}
             error={errors.password}
+          /> */}
+          <PasswordField
+            label="password"
+            name="password"
+            onChange={handleChange}
+            onToggleShowPassword={() => setShowPassword((prev) => !prev)}
+            showPassword={showPassword}
+            id="password"
+            generatePassword={generatePassword}
+            value={formData.password}
           />
+          {/* <PasswordField
+            label="confirm password"
+            name="confirm-password"
+            onChange={handleChange}
+            showPassword={showPassword}
+            id="confirm-password"
+            value={formData.confirmPassword}
+          /> */}
 
           <InputField
             id="confirmPassword"
@@ -168,9 +187,9 @@ export function CreateEmployerModal({
             value={formData.confirmPassword}
             onChange={handleChange}
             placeholder="Confirm password"
-            icon={<Lock size={18} />}
+            // icon={<Lock size={18} />}
             error={errors.confirmPassword}
-            showPasswordToggle
+            // showPasswordToggle
             showPassword={showPassword}
             onTogglePassword={() => setShowPassword((prev) => !prev)}
           />
