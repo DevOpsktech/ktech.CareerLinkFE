@@ -48,6 +48,7 @@ export const authApi = {
       return response;
     } catch (error) {
       // If token is invalid or expired, return null
+      console.log("error", error);
       return { data: null, success: false, message: "Session expired" };
     }
   },
@@ -77,6 +78,7 @@ export const authApi = {
       const expirationTime = payload.exp * 1000; // Convert to milliseconds
       return Date.now() >= expirationTime;
     } catch (error) {
+      console.log("error", error);
       return true;
     }
   },

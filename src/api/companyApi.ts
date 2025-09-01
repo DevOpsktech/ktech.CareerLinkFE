@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ApiResponse, PaginatedResponse } from "../types/api";
 import type { Company } from "../types/employer";
 import { apiClient } from "../utils/api";
@@ -27,155 +28,85 @@ export interface CompanySearchFilters {
   limit?: number;
 }
 
+// Helper functions
+const buildParams = (filters: CompanySearchFilters) => {
+  const params = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined) params.set(key, String(value));
+  });
+  return params.toString();
+};
+
+const createPagination = (data: any[]) => ({
+  page: 1,
+  limit: data.length,
+  total: data.length,
+  totalPages: 1,
+});
+
+const mockResponse = (data = mockCompanies, message = "Mock data") => ({
+  data,
+  success: true,
+  message,
+  pagination: createPagination(data),
+});
+
+const normalizeResponse = (res: any): PaginatedResponse<Company> => {
+  if (res?.$values) return { ...mockResponse(res.$values), message: "Success" };
+  if (res?.data?.$values)
+    return { ...mockResponse(res.data.$values), message: "Success" };
+  if (res?.data) return res;
+  if (Array.isArray(res)) return { ...mockResponse(res), message: "Success" };
+  return mockResponse(mockCompanies, "Fallback");
+};
+
+const validate = (value: any, name: string) => {
+  if (!value?.trim?.()) throw new Error(`${name} is required`);
+};
+
 export const companyApi = {
-  // Get all companies with filters
+  // Get companies with filters
   getCompanies: async (
     filters: CompanySearchFilters = {}
   ): Promise<PaginatedResponse<Company>> => {
     try {
-      const params = new URLSearchParams();
-      if (filters.query) params.set("query", String(filters.query));
-      if (filters.industry) params.set("industry", String(filters.industry));
-      if (filters.companySize)
-        params.set("companySize", String(filters.companySize));
-      if (filters.isVerified !== undefined)
-        params.set("isVerified", String(filters.isVerified));
-      if (filters.page) params.set("page", String(filters.page));
-      if (filters.limit) params.set("limit", String(filters.limit));
-
-      const response = await apiClient.get<PaginatedResponse<Company>>(
-        `/companies?${params.toString()}`
-      );
-
-      console.log("Raw API response:", response);
-
-      // Handle .NET JSON response format with $values (direct response)
-      if (response && typeof response === "object" && "$values" in response) {
-        const dotNetResponse = response as { $values: Company[] };
-        console.log(
-          "Processing .NET response with $values:",
-          dotNetResponse.$values
-        );
-        return {
-          data: dotNetResponse.$values,
-          success: true,
-          message: "Success",
-          pagination: {
-            page: 1,
-            limit: dotNetResponse.$values.length,
-            total: dotNetResponse.$values.length,
-            totalPages: 1,
-          },
-        };
-      }
-
-      // Handle .NET JSON response format with $values (nested in data property)
-      if (
-        response &&
-        typeof response === "object" &&
-        "data" in response &&
-        response.data &&
-        typeof response.data === "object" &&
-        "$values" in response.data
-      ) {
-        const nestedDotNetResponse = response.data as { $values: Company[] };
-        console.log(
-          "Processing nested .NET response with $values:",
-          nestedDotNetResponse.$values
-        );
-        return {
-          data: nestedDotNetResponse.$values,
-          success: true,
-          message: "Success",
-          pagination: {
-            page: 1,
-            limit: nestedDotNetResponse.$values.length,
-            total: nestedDotNetResponse.$values.length,
-            totalPages: 1,
-          },
-        };
-      }
-
-      // Handle regular ApiResponse format
-      if (response && typeof response === "object" && "data" in response) {
-        return response as unknown as PaginatedResponse<Company>;
-      }
-
-      // If response is directly an array
-      if (Array.isArray(response)) {
-        const companiesArray = response as Company[];
-        return {
-          data: companiesArray,
-          success: true,
-          message: "Success",
-          pagination: {
-            page: 1,
-            limit: companiesArray.length,
-            total: companiesArray.length,
-            totalPages: 1,
-          },
-        };
-      }
-
-      // If we reach here, the response structure is unexpected
-      console.warn(
-        "Unexpected response structure, falling back to mock data:",
-        response
-      );
-      return {
-        data: mockCompanies,
-        success: true,
-        message: "Mock data loaded (fallback)",
-        pagination: {
-          page: 1,
-          limit: mockCompanies.length,
-          total: mockCompanies.length,
-          totalPages: 1,
-        },
-      };
+      const params = buildParams(filters);
+      const url = params ? `/companies?${params}` : "/companies";
+      return normalizeResponse(await apiClient.get(url));
     } catch (error) {
-      // Fallback to mock data if API call fails
-      console.warn("API call failed, using mock data:", error);
-      return {
-        data: mockCompanies,
-        success: true,
-        message: "Mock data loaded",
-        pagination: {
-          page: 1,
-          limit: mockCompanies.length,
-          total: mockCompanies.length,
-          totalPages: 1,
-        },
-      };
+      console.warn("API failed, using mock:", error);
+      return mockResponse();
     }
   },
 
   // Get company by ID
   getCompanyById: async (id: string): Promise<ApiResponse<Company>> => {
-    return apiClient.get<Company>(`/companies/${id}`);
+    validate(id, "Company ID");
+    return apiClient.get(`/companies/${encodeURIComponent(id)}`);
   },
 
-  // Create new company
+  // Create company
   createCompany: async (
-    companyData: CreateCompanyRequest
+    data: CreateCompanyRequest
   ): Promise<ApiResponse<Company>> => {
+    validate(data.name, "Company name");
+    validate(data.industry, "Company industry");
+
     try {
-      return apiClient.post<Company>(`/companies`, companyData);
+      return await apiClient.post("/companies", data);
     } catch (error) {
-      // Fallback to mock response if API call fails
-      console.warn("API call failed, returning mock response:", error);
-      const newCompany: Company = {
-        id: `comp-${Date.now()}`,
-        ...companyData,
-        logoUrl: "https://cdn.finedgecapital.com/logo.png",
-        isVerified: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+      console.warn("Create failed, using mock:", error);
       return {
-        data: newCompany,
+        data: {
+          id: `mock-${Date.now()}`,
+          ...data,
+          logoUrl: data.logoUrl || "https://cdn.finedgecapital.com/logo.png",
+          isVerified: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
         success: true,
-        message: "Company created (mock)",
+        message: "Created (mock)",
       };
     }
   },
@@ -183,20 +114,26 @@ export const companyApi = {
   // Update company
   updateCompany: async (
     id: string,
-    companyData: Partial<CreateCompanyRequest>
+    data: Partial<CreateCompanyRequest>
   ): Promise<ApiResponse<Company>> => {
-    return apiClient.put<Company>(`/companies/${id}`, companyData);
+    validate(id, "Company ID");
+    return apiClient.put(`/companies/${encodeURIComponent(id)}`, data);
   },
 
   // Delete company
   deleteCompany: async (id: string): Promise<ApiResponse<boolean>> => {
-    return apiClient.delete<boolean>(`/companies/${id}`);
+    validate(id, "Company ID");
+    return apiClient.delete(`/companies/${encodeURIComponent(id)}`);
   },
 
-  // Toggle company verification status
+  // Toggle verification
   toggleCompanyVerification: async (
     id: string
   ): Promise<ApiResponse<Company>> => {
-    return apiClient.post<Company>(`/companies/${id}/toggle-verification`, {});
+    validate(id, "Company ID");
+    return apiClient.post(
+      `/companies/${encodeURIComponent(id)}/toggle-verification`,
+      {}
+    );
   },
 };
