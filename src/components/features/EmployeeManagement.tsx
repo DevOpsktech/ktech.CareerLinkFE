@@ -3,14 +3,40 @@ import { useEmployers } from "../../hooks/useEmployers";
 import { DataTable } from "../ui/DataTable";
 import { Button } from "../ui/Button";
 import { CreateEmployerModal } from "../modals/job-post-Form/CreateEmployerModal";
-import { Plus, Search, Building2, Mail, Phone, MapPin } from "lucide-react";
-import type { CreateEmployerRequest, Employer } from "../../types/employer";
+import { CreateCompanyModal } from "../modals/CreateCompanyModal";
+import {
+  Plus,
+  Search,
+  Building2,
+  Mail,
+  Phone,
+  MapPin,
+  Building,
+} from "lucide-react";
+import type { Employer } from "../../types/employer";
+import { useAuth } from "../../contexts/AuthContext";
+import { companyApi } from "../../api/companyApi";
+import type { CreateCompanyRequest } from "../../api/companyApi";
+
+interface EmployerFormData {
+  name: string;
+  position: string;
+  companyId: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+}
 
 export function EmployerManagement() {
-  const { employers, loading, error, createEmployer, deleteEmployer } =
-    useEmployers();
+  const { employers, loading, deleteEmployer } = useEmployers();
+  const { register, error } = useAuth();
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isCreateEmployerModalOpen, setIsCreateEmployerModalOpen] =
+    useState(false);
+  const [isCreateCompanyModalOpen, setIsCreateCompanyModalOpen] =
+    useState(false);
 
   const filteredEmployers = employers.filter(
     (employer) =>
@@ -109,10 +135,47 @@ export function EmployerManagement() {
     },
   ];
 
-  const handleCreateEmployer = async (employerData: CreateEmployerRequest) => {
+  const handleCreateCompany = async (companyData: CreateCompanyRequest) => {
     try {
-      await createEmployer(employerData);
-      setIsCreateModalOpen(false);
+      const response = await companyApi.createCompany(companyData);
+      if (response.success) {
+        console.log("Company created successfully:", response.data);
+        setIsCreateCompanyModalOpen(false);
+        // Optionally refresh companies list or show success message
+      }
+    } catch (error) {
+      console.error("Failed to create company:", error);
+    }
+  };
+
+  const handleCreateEmployer = async (employerData: EmployerFormData) => {
+    try {
+      // First register the user with role "Employer"
+      const registerResponse = await register({
+        email: employerData.email,
+        password: employerData.password,
+        fullName: employerData.name,
+        companyId: employerData.companyId,
+        position: employerData.position,
+        phone: employerData.phone,
+        role: "Employer",
+      });
+
+      if (registerResponse) {
+        // Then create the employer profile with additional data
+        // This would typically be done after successful registration
+        // For now, we'll just log the employer data that would be sent
+        console.log("Employer profile data:", {
+          userId: "1003", // Would come from registration response
+          companyId: employerData.companyId,
+          name: employerData.name,
+          email: employerData.email,
+          position: employerData.position,
+          phone: employerData.phone,
+        });
+
+        setIsCreateEmployerModalOpen(false);
+      }
     } catch (error) {
       console.error("Failed to create employer:", error);
     }
@@ -145,13 +208,23 @@ export function EmployerManagement() {
             Manage employer accounts and company information
           </p>
         </div>
-        <Button
-          className="flex items-center justify-center"
-          onClick={() => setIsCreateModalOpen(true)}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Employer
-        </Button>
+        <div className="flex space-x-3">
+          <Button
+            variant="outline"
+            className="flex items-center justify-center"
+            onClick={() => setIsCreateCompanyModalOpen(true)}
+          >
+            <Building className="w-4 h-4 mr-2" />
+            Add Company
+          </Button>
+          <Button
+            className="flex items-center justify-center"
+            onClick={() => setIsCreateEmployerModalOpen(true)}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Employer
+          </Button>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow">
@@ -171,9 +244,16 @@ export function EmployerManagement() {
         <DataTable data={filteredEmployers} columns={columns} />
       </div>
 
-      {isCreateModalOpen && (
+      {isCreateCompanyModalOpen && (
+        <CreateCompanyModal
+          onClose={() => setIsCreateCompanyModalOpen(false)}
+          onSubmit={handleCreateCompany}
+        />
+      )}
+
+      {isCreateEmployerModalOpen && (
         <CreateEmployerModal
-          onClose={() => setIsCreateModalOpen(false)}
+          onClose={() => setIsCreateEmployerModalOpen(false)}
           onSubmit={handleCreateEmployer}
         />
       )}

@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Building, MapPin, Clock, DollarSign } from "lucide-react";
 import { Button } from "../../ui/Button";
+import {
+  formatJobType,
+  formatPostedDate,
+  formatSalary,
+} from "../../jobDetail/JobDetailFunctions";
 
 interface JobCardProps {
   job: any; // ideally type Job
@@ -31,90 +36,6 @@ export function JobCard({
       return fallback;
     }
     return String(value);
-  };
-
-  const formatSalary = (job: any) => {
-    try {
-      // Supports both nested salary and flat salaryMin/Max fields
-      const salary = job.salary;
-      const min = salary?.min ?? job.salaryMin;
-      const max = salary?.max ?? job.salaryMax;
-      const currency = salary?.currency ?? job.salaryCurrency ?? "USD";
-      const periodRaw = salary?.period ?? job.salaryPeriod; // e.g., "hourly" | "yearly" | "hour" | "year"
-
-      if (min == null && max == null) return "Salary not specified";
-
-      const period =
-        periodRaw === "hour"
-          ? "hourly"
-          : periodRaw === "year"
-          ? "yearly"
-          : periodRaw;
-
-      const formatAmount = (a: number) =>
-        period === "hourly"
-          ? `${currencySymbol(currency)}${a}`
-          : `${currencySymbol(currency)}${a.toLocaleString()}`;
-
-      if (min != null && max != null)
-        return `${formatAmount(min)} - ${formatAmount(max)}${
-          period === "hourly"
-            ? "/hour"
-            : period === "yearly"
-            ? "/year"
-            : "/month"
-        }`;
-      if (min != null)
-        return `From ${formatAmount(min)}${
-          period === "hourly"
-            ? "/hour"
-            : period === "yearly"
-            ? "/year"
-            : "/month"
-        }`;
-      return "Competitive salary";
-    } catch (error) {
-      console.warn("Error formatting salary:", error);
-      return "Salary not specified";
-    }
-  };
-
-  const currencySymbol = (code: string) => {
-    switch (code) {
-      case "USD":
-        return "$";
-      case "EUR":
-        return "€";
-      case "GBP":
-        return "£";
-      default:
-        return "$";
-    }
-  };
-
-  const formatJobType = (type: string) => {
-    if (!type || typeof type !== "string") return "Full-time";
-    return type
-      .split("-")
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ");
-  };
-
-  const formatPostedDate = (dateString: string) => {
-    try {
-      if (!dateString) return "Recently posted";
-      const date = new Date(dateString);
-      const now = new Date();
-      const diffDays = Math.ceil(
-        Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
-      );
-      if (diffDays === 1) return "1 day ago";
-      if (diffDays < 7) return `${diffDays} days ago`;
-      if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
-      return `${Math.ceil(diffDays / 30)} months ago`;
-    } catch (error) {
-      return "Recently posted";
-    }
   };
 
   const getCompanyName = (job: any): string => {
@@ -159,7 +80,7 @@ export function JobCard({
               .map((skill: string) => (
                 <span
                   key={skill}
-                  className="px-3 py-1 bg-teal-100 text-teal-700 text-sm rounded-full"
+                  className="px-3 py-1 bg-teal-100 text-teal-700 text-sm rounded-full uppercase"
                 >
                   {skill}
                 </span>

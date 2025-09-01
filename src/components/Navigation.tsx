@@ -83,7 +83,7 @@ export function Navigation() {
                 ))}
 
               {/* Profile Link */}
-              <button
+              {/* <button
                 onClick={() => navigate("/profile")}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
                   isCurrentPath("/profile")
@@ -93,7 +93,7 @@ export function Navigation() {
               >
                 <User size={18} />
                 <span>Profile</span>
-              </button>
+              </button> */}
 
               <button
                 onClick={() => setShowLogoutConfirm(true)}

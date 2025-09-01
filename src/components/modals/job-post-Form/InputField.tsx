@@ -10,6 +10,7 @@ interface InputFieldProps {
   icon: React.ReactNode;
   error?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
 }
 
 export function InputField({
@@ -22,6 +23,7 @@ export function InputField({
   icon,
   error,
   onChange,
+  required = false,
 }: InputFieldProps) {
   return (
     <div>
@@ -45,6 +47,7 @@ export function InputField({
           className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
             error ? "border-red-300" : "border-gray-300"
           }`}
+          required={required}
         />
       </div>
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}

@@ -22,21 +22,21 @@ export const employersApi = {
     if (filters.limit) params.set("limit", String(filters.limit));
 
     const response = await apiClient.get<PaginatedResponse<Employer>>(
-      `/employers?${params.toString()}`
+      `/employer/all?${params.toString()}`
     );
     return response as unknown as PaginatedResponse<Employer>;
   },
 
   // Get employer by ID
   getEmployerById: async (id: string): Promise<ApiResponse<Employer>> => {
-    return apiClient.get<Employer>(`/employers/${id}`);
+    return apiClient.get<Employer>(`/employer/${id}`);
   },
 
   // Get employer by user ID
   getEmployerByUserId: async (
     userId: string
   ): Promise<ApiResponse<Employer>> => {
-    return apiClient.get<Employer>(`/employers/by-user/${userId}`);
+    return apiClient.get<Employer>(`/employer/by-user/${userId}`);
   },
 
   // Create new employer
@@ -51,7 +51,7 @@ export const employersApi = {
     id: string,
     employerData: Partial<CreateEmployerRequest>
   ): Promise<ApiResponse<Employer>> => {
-    return apiClient.put<Employer>(`/employers/${id}`, employerData);
+    return apiClient.put<Employer>(`/employer/profile/${id}`, employerData);
   },
 
   // Delete employer

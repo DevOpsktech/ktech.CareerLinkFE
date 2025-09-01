@@ -1,15 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { jobsApi } from "../api/jobsApi";
 import type { JobApplication } from "../types/job";
+import { useToast } from "../contexts/ToastContext";
 
 export const useApplications = (studentId?: string, jobId?: string) => {
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { showSuccess, showError } = useToast();
+  const lastFetchRef = useRef<string>("");
 
-  const fetchApplications = async () => {
+  const fetchApplications = useCallback(async () => {
     if (!studentId && !jobId) return;
 
+    const fetchKey = studentId || jobId || "";
+
+    // Prevent duplicate requests
+    if (lastFetchRef.current === fetchKey) {
+      return;
+    }
+
+    lastFetchRef.current = fetchKey;
     setLoading(true);
     setError(null);
 
@@ -36,75 +47,102 @@ export const useApplications = (studentId?: string, jobId?: string) => {
         setApplications([]);
       }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch applications"
-      );
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch applications";
+      setError(errorMessage);
+      showError(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
+  }, [studentId, jobId, showError]);
 
-  const applyToJob = async (
-    jobId: string,
-    studentId: string,
-    applicationData: {
-      coverLetter?: string;
-      resumeUrl?: string;
-    }
-  ): Promise<JobApplication | null> => {
-    setLoading(true);
-    setError(null);
+  const applyToJob = useCallback(
+    async (
+      jobId: string,
+      studentId: string,
+      applicationData: {
+        coverLetter?: string;
+        resumeUrl?: string;
+      }
+    ): Promise<JobApplication | null> => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const response = await jobsApi.applyToJob(
-        jobId,
-        studentId,
-        applicationData
-      );
-      await fetchApplications(); // Refresh the list
-      const responseData = response.data || response;
-      return responseData as JobApplication;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to apply to job");
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        const response = await jobsApi.applyToJob(
+          jobId,
+          studentId,
+          applicationData
+        );
+        const responseData = response.data || response;
+        const newApplication = responseData as JobApplication;
 
-  const updateApplicationStatus = async (
-    applicationId: string,
-    status: JobApplication["status"],
-    notes?: string
-  ): Promise<JobApplication | null> => {
-    setLoading(true);
-    setError(null);
+        // Optimistically update the applications list
+        setApplications((prevApplications) => [
+          newApplication,
+          ...prevApplications,
+        ]);
 
-    try {
-      const response = await jobsApi.updateApplicationStatus(
-        applicationId,
-        status,
-        notes
-      );
-      await fetchApplications(); // Refresh the list
-      const responseData = response.data || response;
-      return responseData as JobApplication;
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to update application status"
-      );
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
+        showSuccess("Application submitted successfully!");
+        return newApplication;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to apply to job";
+        setError(errorMessage);
+        showError(errorMessage);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [showSuccess, showError]
+  );
+
+  const updateApplicationStatus = useCallback(
+    async (
+      applicationId: string,
+      status: JobApplication["status"],
+      notes?: string
+    ): Promise<JobApplication | null> => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await jobsApi.updateApplicationStatus(
+          applicationId,
+          status,
+          notes
+        );
+        const responseData = response.data || response;
+        const updatedApplication = responseData as JobApplication;
+
+        // Optimistically update the applications list
+        setApplications((prevApplications) =>
+          prevApplications.map((app) =>
+            app.id === applicationId ? updatedApplication : app
+          )
+        );
+
+        showSuccess("Application status updated successfully!");
+        return updatedApplication;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : "Failed to update application status";
+        setError(errorMessage);
+        showError(errorMessage);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [showSuccess, showError]
+  );
 
   useEffect(() => {
     fetchApplications();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [studentId, jobId]);
+  }, [fetchApplications]);
 
   return {
     applications,

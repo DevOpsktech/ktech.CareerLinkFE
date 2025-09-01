@@ -10,7 +10,7 @@ export default function JobResponsibilities({ responsibilities }) {
         {responsibilities.map((item, i) => (
           <li key={i} className="flex items-start">
             <span className="w-2 h-2 bg-teal-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-            <span className="text-gray-700">{item}</span>
+            <span className="text-gray-700 ">{item}</span>
           </li>
         ))}
       </ul>

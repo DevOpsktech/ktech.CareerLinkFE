@@ -4,6 +4,8 @@ import { PersonalInfo } from "./PersonalInfo";
 import { EducationSection } from "./EducationSection";
 import { SkillsExperience } from "./SkillsExperience";
 import { CvUpload } from "./CvUpload";
+import { useAuth } from "../../../contexts/AuthContext";
+import { useStudent } from "../../../hooks/useStudents";
 
 export function ProfileForm() {
   const [formData, setFormData] = useState({
@@ -12,11 +14,14 @@ export function ProfileForm() {
     phone: "",
     education: "",
     major: "",
-    graduationYear: "",
+    graduationYear: 0,
     skills: "",
     experience: "",
     portfolio: "",
   });
+
+  const { user } = useAuth();
+  const { updateProfile } = useStudent(user?.id);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -36,6 +41,7 @@ export function ProfileForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Profile updated:", formData);
+    updateProfile({ ...formData });
   };
 
   return (

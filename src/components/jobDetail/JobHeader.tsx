@@ -50,14 +50,6 @@ export default function JobHeader({
           <Calendar className="w-4 h-4 mr-1" />
           Posted {formatPostedDate(job.postedDate)}
         </div>
-        {/* <div className="flex items-center">
-          <Users className="w-4 h-4 mr-1" />
-          {job.applicationCount} applications
-        </div> */}
-        {/* <div className="flex items-center">
-          <Eye className="w-4 h-4 mr-1" />
-          {job.viewCount} views
-        </div> */}
         {job.applicationDeadline && (
           <div className="flex items-center">
             <Clock className="w-4 h-4 mr-1" />

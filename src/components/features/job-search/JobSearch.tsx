@@ -26,11 +26,10 @@ export function JobSearch() {
     fetchJobs(searchFilters);
 
   const handleApplyToJob = async (jobId: string) => {
-    if (!user || user.role !== "student") return;
-    const application = await applyToJob(jobId, user.id, {
+    if (!user || user.role !== "Student") return;
+    await applyToJob(jobId, user.id, {
       coverLetter: "I am interested in this position and would like to apply.",
     });
-    if (application) alert("Application submitted successfully!");
   };
 
   return (

@@ -13,7 +13,7 @@ export function StudentSearch() {
     skills: "",
   });
 
-  const { students, loading, error, fetchStudents, pagination } = useStudents();
+  const { students, loading, error, fetchStudents } = useStudents();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -204,7 +204,7 @@ export function StudentSearch() {
                 {students.map((student) => (
                   <tr key={student.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {student.name}
+                      {student.fullName}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {student.major || "Not specified"}

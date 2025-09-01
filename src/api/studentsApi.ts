@@ -23,7 +23,7 @@ export const studentsApi = {
     if (filters.limit) params.set("limit", String(filters.limit));
 
     const response = await apiClient.get<PaginatedResponse<Student>>(
-      `/students?${params.toString()}`
+      `/student/all?${params.toString()}`
     );
     return response as unknown as PaginatedResponse<Student>;
   },
@@ -40,10 +40,9 @@ export const studentsApi = {
 
   // Update student profile
   updateStudentProfile: async (
-    studentId: string,
     profileData: UpdateStudentProfileRequest
   ): Promise<ApiResponse<Student>> => {
-    return apiClient.put<Student>(`/students/${studentId}`, profileData);
+    return apiClient.put<Student>(`/student/profile`, profileData);
   },
 
   // Add student skill

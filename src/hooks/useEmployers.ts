@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type {
   CreateEmployerRequest,
   Employer,
   EmployerSearchFilters,
 } from "../types/employer";
 import { employersApi } from "../api/employerApi";
+import { useToast } from "../contexts/ToastContext";
 
 export const useEmployers = (filters: EmployerSearchFilters = {}) => {
   const [employers, setEmployers] = useState<Employer[]>([]);
@@ -17,116 +18,163 @@ export const useEmployers = (filters: EmployerSearchFilters = {}) => {
     totalPages: 0,
   });
 
-  const fetchEmployers = async (searchFilters: EmployerSearchFilters = {}) => {
-    setLoading(true);
-    setError(null);
+  const { showSuccess, showError } = useToast();
+  const lastFetchRef = useRef<string>("");
+  const isInitializedRef = useRef(false);
 
-    try {
-      const response = await employersApi.getEmployers({
-        ...filters,
-        ...searchFilters,
-      });
+  const fetchEmployers = useCallback(
+    async (searchFilters: EmployerSearchFilters = {}) => {
+      const filterKey = JSON.stringify({ ...filters, ...searchFilters });
 
-      // Handle the new API response structure
-      const responseData = response.data || response;
-
-      // Check if response is an array or has $values property
-      if (Array.isArray(responseData)) {
-        setEmployers(responseData);
-      } else if (
-        responseData &&
-        typeof responseData === "object" &&
-        "$values" in responseData
-      ) {
-        setEmployers((responseData as { $values: Employer[] }).$values);
-      } else {
-        setEmployers([]);
+      // Prevent duplicate requests
+      if (lastFetchRef.current === filterKey && isInitializedRef.current) {
+        return;
       }
 
-      // Handle pagination if available
-      if (
-        responseData &&
-        typeof responseData === "object" &&
-        "pagination" in responseData
-      ) {
-        setPagination(
-          (responseData as { pagination: typeof pagination }).pagination
+      setLoading(true);
+      setError(null);
+      lastFetchRef.current = filterKey;
+
+      try {
+        const response = await employersApi.getEmployers({
+          ...filters,
+          ...searchFilters,
+        });
+
+        // Handle the new API response structure
+        const responseData = response.data || response;
+
+        // Check if response is an array or has $values property
+        if (Array.isArray(responseData)) {
+          setEmployers(responseData);
+        } else if (
+          responseData &&
+          typeof responseData === "object" &&
+          "$values" in responseData
+        ) {
+          setEmployers((responseData as { $values: Employer[] }).$values);
+        } else {
+          setEmployers([]);
+        }
+
+        // Handle pagination if available
+        if (
+          responseData &&
+          typeof responseData === "object" &&
+          "pagination" in responseData
+        ) {
+          setPagination(
+            (responseData as { pagination: typeof pagination }).pagination
+          );
+        }
+
+        isInitializedRef.current = true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to fetch employers";
+        setError(errorMessage);
+        showError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [filters, showError]
+  );
+
+  const createEmployer = useCallback(
+    async (employerData: CreateEmployerRequest): Promise<Employer | null> => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await employersApi.createEmployer(employerData);
+        const responseData = response.data || response;
+        const newEmployer = responseData as Employer;
+
+        // Optimistically update the employers list
+        setEmployers((prevEmployers) => [newEmployer, ...prevEmployers]);
+
+        showSuccess("Employer created successfully!");
+        return newEmployer;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to create employer";
+        setError(errorMessage);
+        showError(errorMessage);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [showSuccess, showError]
+  );
+
+  const updateEmployer = useCallback(
+    async (
+      id: string,
+      employerData: Partial<CreateEmployerRequest>
+    ): Promise<Employer | null> => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await employersApi.updateEmployer(id, employerData);
+        const responseData = response.data || response;
+        const updatedEmployer = responseData as Employer;
+
+        // Optimistically update the employers list
+        setEmployers((prevEmployers) =>
+          prevEmployers.map((employer) =>
+            employer.id === id ? updatedEmployer : employer
+          )
         );
+
+        showSuccess("Employer updated successfully!");
+        return updatedEmployer;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to update employer";
+        setError(errorMessage);
+        showError(errorMessage);
+        return null;
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch employers"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [showSuccess, showError]
+  );
 
-  const createEmployer = async (
-    employerData: CreateEmployerRequest
-  ): Promise<Employer | null> => {
-    setLoading(true);
-    setError(null);
+  const deleteEmployer = useCallback(
+    async (id: string): Promise<boolean> => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const response = await employersApi.createEmployer(employerData);
-      await fetchEmployers(); // Refresh the list
-      const responseData = response.data || response;
-      return responseData as Employer;
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to create employer"
-      );
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        await employersApi.deleteEmployer(id);
 
-  const updateEmployer = async (
-    id: string,
-    employerData: Partial<CreateEmployerRequest>
-  ): Promise<Employer | null> => {
-    setLoading(true);
-    setError(null);
+        // Optimistically update the employers list
+        setEmployers((prevEmployers) =>
+          prevEmployers.filter((employer) => employer.id !== id)
+        );
 
-    try {
-      const response = await employersApi.updateEmployer(id, employerData);
-      await fetchEmployers(); // Refresh the list
-      const responseData = response.data || response;
-      return responseData as Employer;
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to update employer"
-      );
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteEmployer = async (id: string): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      await employersApi.deleteEmployer(id);
-      await fetchEmployers(); // Refresh the list
-      return true;
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to delete employer"
-      );
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
+        showSuccess("Employer deleted successfully!");
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to delete employer";
+        setError(errorMessage);
+        showError(errorMessage);
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [showSuccess, showError]
+  );
 
   useEffect(() => {
     fetchEmployers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchEmployers]);
 
   return {
     employers,
@@ -145,10 +193,20 @@ export const useEmployer = (id?: string, userId?: string) => {
   const [employer, setEmployer] = useState<Employer | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
+  const lastFetchRef = useRef<string>("");
 
-  const fetchEmployer = async () => {
+  const fetchEmployer = useCallback(async () => {
     if (!id && !userId) return;
 
+    const fetchKey = id || userId || "";
+
+    // Prevent duplicate requests
+    if (lastFetchRef.current === fetchKey) {
+      return;
+    }
+
+    lastFetchRef.current = fetchKey;
     setLoading(true);
     setError(null);
 
@@ -161,16 +219,18 @@ export const useEmployer = (id?: string, userId?: string) => {
       const responseData = response.data || response;
       setEmployer(responseData as Employer);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch employer");
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch employer";
+      setError(errorMessage);
+      showError(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, userId, showError]);
 
   useEffect(() => {
     fetchEmployer();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, userId]);
+  }, [fetchEmployer]);
 
   return {
     employer,

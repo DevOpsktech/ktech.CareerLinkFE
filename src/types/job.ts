@@ -131,6 +131,7 @@ export interface CreateJobRequest {
   skills: string[];
   applicationDeadline?: string;
   isRemote: boolean;
+  companyId: string;
 }
 
 export interface JobSearchFilters {

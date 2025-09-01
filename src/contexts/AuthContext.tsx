@@ -7,6 +7,7 @@ import type {
   RegisterCredentials,
   UpdateCredentials,
 } from "../types/auth";
+import { useToast } from "./ToastContext";
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<boolean>;
@@ -27,6 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isLoading: false,
     error: null,
   });
+  const { showSuccess, showError } = useToast();
 
   // Check for existing session on mount
   useEffect(() => {
@@ -54,6 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         } catch (error) {
           console.error("Failed to verify session:", error);
+          showError("Failed to verify session");
           authApi.removeToken();
           setAuthState({
             user: null,
@@ -75,16 +78,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await authApi.login(credentials);
 
       if (!response.data) {
+        showError("No data received from login response");
         throw new Error("No data received from login response");
       }
 
       const { token, user } = response.data;
 
       if (!token) {
+        showError("No token received from login response");
         throw new Error("No token received from login response");
       }
 
       if (!user) {
+        showError("No user data received from login response");
         throw new Error("No user data received from login response");
       }
 
@@ -100,9 +106,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
 
       setAuthState({ user: authUser, token, isLoading: false, error: null });
+      showSuccess("Login successful");
       return true;
     } catch (error) {
       console.error("Login error:", error); // Debug log
+      showError("Login failed");
       const errorMessage =
         error instanceof Error ? error.message : "Login failed";
       setAuthState((prev) => ({
@@ -122,8 +130,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await authApi.register(credentials);
       setAuthState((prev) => ({ ...prev, isLoading: false, error: null }));
+      showSuccess("Registration successful");
       return true;
     } catch (error) {
+      showError("Registration failed");
       const errorMessage =
         error instanceof Error ? error.message : "Registration failed";
       setAuthState((prev) => ({
@@ -148,8 +158,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Refresh user data
       await refreshUser();
-
       setAuthState((prev) => ({ ...prev, isLoading: false, error: null }));
+      showSuccess("Profile updated successfully");
       return true;
     } catch (error) {
       const errorMessage =
@@ -159,6 +169,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading: false,
         error: errorMessage,
       }));
+      showError("Profile update failed");
       return false;
     }
   };
@@ -169,6 +180,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await authApi.deleteProfile();
       logout(); // Clear auth state after deletion
+      showSuccess("Profile deleted successfully");
       return true;
     } catch (error) {
       const errorMessage =
@@ -178,6 +190,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading: false,
         error: errorMessage,
       }));
+      showError("Profile deletion failed");
       return false;
     }
   };
@@ -195,6 +208,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           isAuthenticated: true,
         };
         setAuthState((prev) => ({ ...prev, user }));
+        showSuccess("User refreshed successfully");
       } else {
         setAuthState({
           user: null,
@@ -203,11 +217,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           error: null,
         });
         authApi.removeToken();
+        showError("User refresh failed");
       }
     } catch (error) {
       console.error("Failed to refresh user session:", error);
       setAuthState({ user: null, token: null, isLoading: false, error: null });
       authApi.removeToken();
+      showError("User refresh failed");
     }
   };
 

@@ -8,6 +8,9 @@ export interface RegisterCredentials {
   password: string;
   fullName: string;
   role: "Student" | "Employer" | "Admin";
+  companyId?: string;
+  position?: string;
+  phone?: string;
 }
 
 export interface UpdateCredentials {

@@ -78,7 +78,7 @@ export default function JobDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Success Message */}
         {applicationSuccess && <SuccessMessage />}
 
@@ -119,7 +119,7 @@ export default function JobDetailPage() {
               job.skills.map((skill: string, index: number) => (
                 <span
                   key={`${job.id}-skill-${index}`}
-                  className="px-3 py-1 bg-teal-100 text-teal-700 text-sm rounded-full"
+                  className="px-3 py-1 bg-teal-100 text-teal-700 text-sm rounded-full uppercase"
                 >
                   {skill}
                 </span>

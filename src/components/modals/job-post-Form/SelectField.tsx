@@ -9,6 +9,8 @@ interface SelectFieldProps {
   icon: React.ReactNode;
   options: { value: string; label: string }[];
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  disabled?: boolean;
+  required?: boolean;
 }
 
 export function SelectField({
@@ -20,6 +22,8 @@ export function SelectField({
   icon,
   options,
   onChange,
+  disabled = false,
+  required = false,
 }: SelectFieldProps) {
   return (
     <div>
@@ -38,11 +42,12 @@ export function SelectField({
           name={name}
           value={value}
           onChange={onChange}
+          disabled={disabled}
+          required={required}
           className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
             error ? "border-red-300" : "border-gray-300"
-          }`}
+          } ${disabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
         >
-          <option value="">Select {label}</option>
           {options.map(({ value, label }) => (
             <option key={value} value={value}>
               {label}

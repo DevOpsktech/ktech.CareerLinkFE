@@ -22,7 +22,10 @@ export function EmployerDashboard() {
   } = useApplications(user?.id);
 
   const onViewCv = (cvUrl: string) => window.open(cvUrl, "_blank");
-  const onShortlist = (student: any) => alert(`Shortlisted ${student.name}`);
+  const onShortlist = (student: any) => {
+    // This will be handled by the StudentActionsMenu component with toast notifications
+    console.log(`Shortlisted ${student.name}`);
+  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">

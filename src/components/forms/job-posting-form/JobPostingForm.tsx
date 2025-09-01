@@ -9,9 +9,14 @@ import { DescriptionSection } from "./DescriptionSection";
 import { ResponsibilitiesSection } from "./ResponsibilitiesSection";
 import { RequirementsSection } from "./RequirementsSection";
 import { FormActions } from "./FormActions";
+import { useAuth } from "../../../contexts/AuthContext";
 
 export function JobPostingForm() {
   const { createJob, loading } = useJobs();
+  const { user } = useAuth();
+  console.log(user);
+  const company_id = user?.employer?.company?.id;
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -81,6 +86,7 @@ export function JobPostingForm() {
         .filter((s) => s),
       applicationDeadline: formData.applicationDeadline || undefined,
       isRemote: formData.isRemote,
+      companyId: company_id,
     };
 
     const newJob = await createJob(jobData);
