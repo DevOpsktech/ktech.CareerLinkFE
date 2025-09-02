@@ -1,6 +1,6 @@
 import type { ApiResponse } from "../types/api";
 
-const API_BASE_URL = "http://localhost:5000/api";
+export const API_BASE_URL = "http://localhost:5000/api";
 const MOCK_DELAY = 800; // Simulate network delay
 
 // Simulate network delay

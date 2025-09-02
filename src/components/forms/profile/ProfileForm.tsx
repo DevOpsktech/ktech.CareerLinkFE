@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Button } from "../../ui/Button";
 import { PersonalInfo } from "./PersonalInfo";
 import { EducationSection } from "./EducationSection";
-import { SkillsExperience } from "./SkillsExperience";
 import { CvUpload } from "./CvUpload";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useStudent } from "../../../hooks/useStudents";
+import { SkillsSection } from "../job-posting-form/SkillSection";
 
 export function ProfileForm() {
   const [formData, setFormData] = useState({
@@ -48,7 +48,7 @@ export function ProfileForm() {
     <form onSubmit={handleSubmit} className="space-y-6">
       <PersonalInfo formData={formData} onChange={handleChange} />
       <EducationSection formData={formData} onChange={handleChange} />
-      <SkillsExperience formData={formData} onChange={handleChange} />
+      <SkillsSection formData={formData} onChange={handleChange} />
       <CvUpload onFileUpload={handleFileUpload} />
 
       <div className="flex justify-end">
