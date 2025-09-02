@@ -2,9 +2,10 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { jobsApi } from "../api/jobsApi";
 import type { CreateJobRequest, Job, JobSearchFilters } from "../types/job";
 import { cleanApiResponse, transformJobData } from "../utils/api";
+import { parseJobsResponse } from "../utils/responseParser";
 import { useToast } from "../contexts/ToastContext";
 
-export const useJobs = (filters: JobSearchFilters = {}) => {
+export const useJobs = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,9 +20,9 @@ export const useJobs = (filters: JobSearchFilters = {}) => {
   const lastFetchRef = useRef<string>("");
   const isInitializedRef = useRef(false);
 
-  const fetchJobs = useCallback(
-    async (searchFilters: JobSearchFilters = {}) => {
-      const filterKey = JSON.stringify({ ...filters, ...searchFilters });
+  const fetchAllJobs = useCallback(
+    async (pageSize: number = 10) => {
+      const filterKey = `all-jobs-${pageSize}`;
 
       // Prevent duplicate requests
       if (lastFetchRef.current === filterKey && isInitializedRef.current) {
@@ -33,38 +34,71 @@ export const useJobs = (filters: JobSearchFilters = {}) => {
       lastFetchRef.current = filterKey;
 
       try {
-        const response = await jobsApi.getJobs({
-          ...filters,
-          ...searchFilters,
-        });
+        console.log("fetchAllJobs called with pageSize:", pageSize);
+        const response = await jobsApi.getAllJobs(pageSize);
+        console.log("fetchAllJobs raw response:", response);
 
-        // Handle the new API response structure
-        const responseData = response.data || response;
-        const cleanedJobs = cleanApiResponse(responseData as Job[]) as Job[];
-        setJobs(cleanedJobs);
+        // Parse the response using the utility function
+        const parsedResponse = parseJobsResponse(response, pageSize);
+        console.log("fetchAllJobs parsed response:", parsedResponse);
 
-        // Handle pagination if available
-        if (
-          responseData &&
-          typeof responseData === "object" &&
-          "pagination" in responseData
-        ) {
-          setPagination(
-            (responseData as { pagination: typeof pagination }).pagination
-          );
-        }
+        setJobs(parsedResponse.jobs);
+        setPagination(parsedResponse.pagination);
 
         isInitializedRef.current = true;
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to fetch jobs";
         setError(errorMessage);
+        // Call showError directly instead of depending on it
         showError(errorMessage);
       } finally {
         setLoading(false);
       }
     },
-    [filters, showError]
+    [] // No dependencies - function will be stable
+  );
+
+  const fetchJobs = useCallback(
+    async (searchFilters: JobSearchFilters = {}) => {
+      const filterKey = JSON.stringify(searchFilters);
+
+      // Prevent duplicate requests
+      if (lastFetchRef.current === filterKey && isInitializedRef.current) {
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      lastFetchRef.current = filterKey;
+
+      try {
+        console.log("fetchJobs called with filters:", searchFilters);
+        const response = await jobsApi.getJobs(searchFilters);
+        console.log("fetchJobs raw response:", response);
+
+        // Parse the response using the utility function
+        const parsedResponse = parseJobsResponse(
+          response,
+          searchFilters.pageSize || 10
+        );
+        console.log("fetchJobs parsed response:", parsedResponse);
+
+        setJobs(parsedResponse.jobs);
+        setPagination(parsedResponse.pagination);
+
+        isInitializedRef.current = true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to fetch jobs";
+        setError(errorMessage);
+        // Call showError directly instead of depending on it
+        showError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [] // No dependencies - function will be stable
   );
 
   const createJob = useCallback(
@@ -155,8 +189,11 @@ export const useJobs = (filters: JobSearchFilters = {}) => {
   );
 
   useEffect(() => {
-    fetchJobs();
-  }, [fetchJobs]);
+    // Only fetch jobs on initial mount with default filters
+    if (!isInitializedRef.current) {
+      fetchAllJobs(10);
+    }
+  }, []); // Empty dependency array - only run once on mount
 
   return {
     jobs,
@@ -164,10 +201,11 @@ export const useJobs = (filters: JobSearchFilters = {}) => {
     error,
     pagination,
     fetchJobs,
+    fetchAllJobs,
     createJob,
     updateJob,
     deleteJob,
-    refetch: () => fetchJobs(),
+    refetch: () => fetchAllJobs(10),
   };
 };
 
@@ -202,16 +240,19 @@ export const useJob = (id: string) => {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to fetch job";
       setError(errorMessage);
+      // Call showError directly instead of depending on it
       showError(errorMessage);
       setJob(null);
     } finally {
       setLoading(false);
     }
-  }, [id, showError]);
+  }, [id]); // Only depend on id
 
   useEffect(() => {
-    fetchJob();
-  }, [fetchJob]);
+    if (id) {
+      fetchJob();
+    }
+  }, [id]); // Only depend on id, not fetchJob
 
   return {
     job,

@@ -4,6 +4,7 @@ import type {
   StudentSearchFilters,
   UpdateStudentProfileRequest,
 } from "../types/student";
+import type { JobApplication, ApplyToJobRequest } from "../types/job";
 import { apiClient } from "../utils/api";
 
 export const studentsApi = {
@@ -98,6 +99,16 @@ export const studentsApi = {
   ): Promise<ApiResponse<Student>> => {
     return apiClient.delete<Student>(
       `/students/${studentId}/experiences/${encodeURIComponent(experienceId)}`
+    );
+  },
+
+  // Apply to job using the new Student API endpoint
+  applyToJob: async (
+    applicationData: ApplyToJobRequest
+  ): Promise<ApiResponse<JobApplication>> => {
+    return apiClient.post<JobApplication>(
+      `/Student/apply-to-job`,
+      applicationData
     );
   },
 };

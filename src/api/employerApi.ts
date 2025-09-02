@@ -4,6 +4,7 @@ import type {
   Employer,
   EmployerSearchFilters,
 } from "../types/employer";
+import type { JobApplication } from "../types/job";
 import { apiClient } from "../utils/api";
 
 export const employersApi = {
@@ -62,5 +63,21 @@ export const employersApi = {
   // Toggle employer status
   toggleEmployerStatus: async (id: string): Promise<ApiResponse<Employer>> => {
     return apiClient.post<Employer>(`/employers/${id}/toggle-status`, {});
+  },
+
+  // ----------------------
+  // Job Applicants
+  // ----------------------
+
+  // Get all applicants for employer's jobs
+  getJobApplicants: async (): Promise<ApiResponse<JobApplication[]>> => {
+    return apiClient.get<JobApplication[]>(`/Employer/job-applicants`);
+  },
+
+  // Get applicants for specific job
+  getJobApplicantsByJobId: async (
+    jobId: string
+  ): Promise<ApiResponse<JobApplication[]>> => {
+    return apiClient.get<JobApplication[]>(`/Employer/job/${jobId}/applicants`);
   },
 };

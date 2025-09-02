@@ -149,9 +149,9 @@ export function StudentSearch() {
 
       {/* Search Results */}
       <div className="bg-white rounded-xl shadow-sm">
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+        {/* <div className="p-6 border-b border-gray-100 flex justify-between items-center">
           <h3 className="text-lg font-semibold text-gray-900">
-            {/* Search Results ({pagination.total} students found) */}
+            Search Results ({pagination.total} students found)
           </h3>
           <div className="flex items-center space-x-2">
             <Button variant="outline" size="sm">
@@ -163,7 +163,7 @@ export function StudentSearch() {
               Export
             </Button>
           </div>
-        </div>
+        </div> */}
 
         {loading ? (
           <div className="text-center py-8">
@@ -178,7 +178,7 @@ export function StudentSearch() {
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-100">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Name

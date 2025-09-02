@@ -102,21 +102,7 @@ const CompanyTable = () => {
         </div>
       ),
     },
-    {
-      key: "isVerified",
-      label: "Status",
-      render: (row: Record<string, unknown>) => (
-        <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            row.isVerified
-              ? "bg-green-100 text-green-800"
-              : "bg-yellow-100 text-yellow-800"
-          }`}
-        >
-          {row.isVerified ? "Verified" : "Pending"}
-        </span>
-      ),
-    },
+
     {
       key: "createdAt",
       label: "Joined",

@@ -131,15 +131,22 @@ export const apiClient = new ApiClient();
  * This is needed for .NET JSON serialization responses
  */
 export function cleanApiResponse<T>(data: unknown): T {
+  console.log("cleanApiResponse called with:", data);
+
   if (data === null || data === undefined) {
     return data as T;
   }
 
   if (Array.isArray(data)) {
+    console.log("cleanApiResponse: Processing array");
     return data.map((item) => cleanApiResponse(item)) as T;
   }
 
   if (typeof data === "object") {
+    console.log(
+      "cleanApiResponse: Processing object with keys:",
+      Object.keys(data as Record<string, unknown>)
+    );
     const cleaned: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(
@@ -147,11 +154,13 @@ export function cleanApiResponse<T>(data: unknown): T {
     )) {
       // Skip $id properties
       if (key === "$id" || key === "$ref") {
+        console.log("cleanApiResponse: Skipping", key);
         continue;
       }
 
       // Handle $values arrays
       if (key === "$values" && Array.isArray(value)) {
+        console.log("cleanApiResponse: Found $values array, returning early");
         return cleanApiResponse(value) as T;
       }
 

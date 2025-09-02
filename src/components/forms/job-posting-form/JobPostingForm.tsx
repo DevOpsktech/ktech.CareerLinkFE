@@ -11,11 +11,15 @@ import { RequirementsSection } from "./RequirementsSection";
 import { FormActions } from "./FormActions";
 import { useAuth } from "../../../contexts/AuthContext";
 
-export function JobPostingForm() {
+interface JobPostingFormProps {
+  onJobCreated?: () => void;
+}
+
+export function JobPostingForm({ onJobCreated }: JobPostingFormProps) {
   const { createJob, loading } = useJobs();
   const { user } = useAuth();
-  console.log(user);
   const company_id = user?.employer?.company?.id;
+  const employer_id = user?.employer?.id;
 
   const [formData, setFormData] = useState({
     title: "",
@@ -52,6 +56,7 @@ export function JobPostingForm() {
     e.preventDefault();
 
     const jobData: CreateJobRequest = {
+      employerId: employer_id,
       title: formData.title,
       description: formData.description,
       requirements: formData.requirements
@@ -64,19 +69,14 @@ export function JobPostingForm() {
             .map((s) => s.trim())
             .filter((s) => s)
         : undefined,
-      salary:
-        formData.salaryMin || formData.salaryMax
-          ? {
-              min: formData.salaryMin
-                ? parseFloat(formData.salaryMin)
-                : undefined,
-              max: formData.salaryMax
-                ? parseFloat(formData.salaryMax)
-                : undefined,
-              currency: formData.salaryCurrency,
-              period: formData.salaryPeriod,
-            }
-          : undefined,
+      salaryMin: formData.salaryMin
+        ? parseFloat(formData.salaryMin)
+        : undefined,
+      salaryMax: formData.salaryMax
+        ? parseFloat(formData.salaryMax)
+        : undefined,
+      salaryCurrency: formData.salaryCurrency,
+      salaryPeriod: formData.salaryPeriod,
       location: formData.location,
       type: formData.type,
       experienceLevel: formData.experienceLevel,
@@ -109,6 +109,9 @@ export function JobPostingForm() {
         applicationDeadline: "",
         isRemote: false,
       });
+
+      // Call the callback to refresh the jobs list
+      onJobCreated?.();
     }
   };
 

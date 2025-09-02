@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { jobsApi } from "../api/jobsApi";
-import type { JobApplication } from "../types/job";
+import type { JobApplication, ApplyToJobRequest } from "../types/job";
 import { useToast } from "../contexts/ToastContext";
 
 export const useApplications = (studentId?: string, jobId?: string) => {
@@ -27,14 +27,14 @@ export const useApplications = (studentId?: string, jobId?: string) => {
     try {
       const response = studentId
         ? await jobsApi.getStudentApplications(studentId)
-        : await jobsApi.getJobApplications(jobId!);
+        : await jobsApi.getJobsByEmployer(jobId!);
 
       // Handle the new API response structure
       const responseData = response.data || response;
 
       // Check if response is an array or has $values property
       if (Array.isArray(responseData)) {
-        setApplications(responseData);
+        setApplications(responseData.map((item) => item as JobApplication));
       } else if (
         responseData &&
         typeof responseData === "object" &&
@@ -58,22 +58,13 @@ export const useApplications = (studentId?: string, jobId?: string) => {
 
   const applyToJob = useCallback(
     async (
-      jobId: string,
-      studentId: string,
-      applicationData: {
-        coverLetter?: string;
-        resumeUrl?: string;
-      }
+      applicationData: ApplyToJobRequest
     ): Promise<JobApplication | null> => {
       setLoading(true);
       setError(null);
 
       try {
-        const response = await jobsApi.applyToJob(
-          jobId,
-          studentId,
-          applicationData
-        );
+        const response = await jobsApi.applyToJob(applicationData);
         const responseData = response.data || response;
         const newApplication = responseData as JobApplication;
 

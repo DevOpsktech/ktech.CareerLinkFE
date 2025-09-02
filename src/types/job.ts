@@ -89,6 +89,7 @@ export interface LegacyJob {
 }
 
 export interface JobApplication {
+  jobTitle: string;
   id: string;
   jobId: string;
   studentId: string;
@@ -113,37 +114,51 @@ export interface JobApplication {
   employerNotes?: string;
   rejectionReason?: string;
 }
-
 export interface CreateJobRequest {
   title: string;
+  employerId: string;
+  companyId: string;
   description: string;
   requirements: string[];
   responsibilities?: string[];
-  salary?: {
-    min?: number;
-    max?: number;
-    currency: string;
-    period: "hourly" | "monthly" | "yearly";
-  };
+  skills: string[];
+  salaryMin?: number;
+  salaryMax?: number;
+  salaryCurrency: string;
+  salaryPeriod: "hourly" | "monthly" | "yearly";
   location: string;
   type: "full-time" | "part-time" | "internship" | "contract";
   experienceLevel: "entry" | "junior" | "mid" | "senior";
-  skills: string[];
-  applicationDeadline?: string;
   isRemote: boolean;
-  companyId: string;
+  applicationDeadline?: string;
+  status?: "active" | "closed" | "draft";
 }
 
 export interface JobSearchFilters {
-  query?: string;
+  q?: string; // Text search across title, description, and location
   location?: string;
-  jobType?: string;
-  company?: string;
-  experienceLevel?: string;
-  skills?: string[];
+  isRemote?: boolean;
+  type?: "full-time" | "part-time" | "internship" | "contract";
+  experienceLevel?: "entry" | "junior" | "mid" | "senior";
   salaryMin?: number;
   salaryMax?: number;
-  isRemote?: boolean;
+  companyId?: string;
+  status?: "active" | "closed" | "draft";
+  skills?: string[];
+  sortBy?: "title" | "location" | "salary" | "posted" | "applications";
+  sortOrder?: "asc" | "desc";
   page?: number;
+  pageSize?: number;
+  // Legacy fields for backward compatibility
+  query?: string;
+  jobType?: string;
+  company?: string;
   limit?: number;
+}
+
+export interface ApplyToJobRequest {
+  jobId: string;
+  studentId: string;
+  coverLetter?: string;
+  resumeUrl?: string;
 }

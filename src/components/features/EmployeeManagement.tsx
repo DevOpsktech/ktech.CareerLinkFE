@@ -44,6 +44,7 @@ export function EmployerManagement() {
       employer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       employer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  console.log(employers);
 
   const columns = [
     {
@@ -70,7 +71,7 @@ export function EmployerManagement() {
       label: "Contact Person",
       render: (employer: Employer) => (
         <div>
-          <div className="font-medium text-gray-900">{employer.name}</div>
+          <div className="font-medium text-gray-900">{employer.fullName}</div>
           <div className="text-sm text-gray-500">
             {employer.position || "N/A"}
           </div>

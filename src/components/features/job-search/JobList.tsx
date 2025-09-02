@@ -34,13 +34,17 @@ export function JobList({
     );
   }
 
-  if (jobs.length == 0 && !loading) {
+  if (!jobs || jobs.length === 0) {
+    console.log("JobList: No jobs or empty jobs array:", jobs);
     return (
       <div className="text-center py-8">
         <p className="text-gray-600">No jobs found.</p>
       </div>
     );
   }
+  console.log("JobList: Jobs received:", jobs);
+  console.log("JobList: Jobs length:", jobs.length);
+  console.log("JobList: First job:", jobs[0]);
 
   return (
     <div className="space-y-4">

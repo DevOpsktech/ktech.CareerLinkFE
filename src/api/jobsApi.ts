@@ -1,33 +1,64 @@
-import type { ApiResponse, PaginatedResponse } from "../types/api";
+import type { ApiResponse, SearchResponse } from "../types/api";
 import type {
-  CreateJobRequest,
   Job,
-  JobApplication,
+  CreateJobRequest,
   JobSearchFilters,
+  JobApplication,
+  ApplyToJobRequest,
 } from "../types/job";
 import { apiClient } from "../utils/api";
 
 export const jobsApi = {
-  // Get all jobs with filters
+  // Get all jobs without search parameters (for initial load)
+  getAllJobs: async (pageSize: number = 10): Promise<SearchResponse<Job>> => {
+    const params = new URLSearchParams();
+    params.set("pageSize", String(pageSize));
+    params.set("page", "1");
+
+    const response = await apiClient.get<SearchResponse<Job>>(
+      `/Jobs?${params.toString()}`
+    );
+    return response as unknown as SearchResponse<Job>;
+  },
+
+  // Get all jobs with filters using the new search endpoint
   getJobs: async (
     filters: JobSearchFilters = {}
-  ): Promise<PaginatedResponse<Job>> => {
+  ): Promise<SearchResponse<Job>> => {
     const params = new URLSearchParams();
-    if (filters.query) params.set("query", String(filters.query));
+
+    // New search parameters
+    if (filters.q) params.set("q", String(filters.q));
     if (filters.location) params.set("location", String(filters.location));
-    if (filters.jobType) params.set("jobType", String(filters.jobType));
-    if (filters.company) params.set("company", String(filters.company));
-    if (filters.experienceLevel)
-      params.set("experienceLevel", String(filters.experienceLevel));
     if (filters.isRemote !== undefined)
       params.set("isRemote", String(filters.isRemote));
+    if (filters.type) params.set("type", String(filters.type));
+    if (filters.experienceLevel)
+      params.set("experienceLevel", String(filters.experienceLevel));
+    if (filters.salaryMin) params.set("salaryMin", String(filters.salaryMin));
+    if (filters.salaryMax) params.set("salaryMax", String(filters.salaryMax));
+    if (filters.companyId) params.set("companyId", String(filters.companyId));
+    if (filters.status) params.set("status", String(filters.status));
+    if (filters.skills && filters.skills.length > 0)
+      params.set("skills", filters.skills.join(","));
+    if (filters.sortBy) params.set("sortBy", String(filters.sortBy));
+    if (filters.sortOrder) params.set("sortOrder", String(filters.sortOrder));
     if (filters.page) params.set("page", String(filters.page));
-    if (filters.limit) params.set("limit", String(filters.limit));
+    if (filters.pageSize) params.set("pageSize", String(filters.pageSize));
 
-    const response = await apiClient.get<PaginatedResponse<Job>>(
-      `/jobs?${params.toString()}`
+    // Legacy parameters for backward compatibility
+    if (filters.query && !filters.q) params.set("q", String(filters.query));
+    if (filters.jobType && !filters.type)
+      params.set("type", String(filters.jobType));
+    if (filters.company && !filters.companyId)
+      params.set("companyId", String(filters.company));
+    if (filters.limit && !filters.pageSize)
+      params.set("pageSize", String(filters.limit));
+
+    const response = await apiClient.get<SearchResponse<Job>>(
+      `/Jobs/search?${params.toString()}`
     );
-    return response as unknown as PaginatedResponse<Job>;
+    return response as unknown as SearchResponse<Job>;
   },
 
   // Get job by ID
@@ -68,18 +99,12 @@ export const jobsApi = {
 
   // Apply to job (create application)
   applyToJob: async (
-    jobId: string,
-    studentId: string,
-    applicationData: {
-      coverLetter?: string;
-      resumeUrl?: string;
-    }
+    applicationData: ApplyToJobRequest
   ): Promise<ApiResponse<JobApplication>> => {
-    return apiClient.post<JobApplication>(`/JobApplications`, {
-      jobId,
-      studentId,
-      ...applicationData,
-    });
+    return apiClient.post<JobApplication>(
+      `/Student/apply-to-job`,
+      applicationData
+    );
   },
 
   // Get all applications (optionally filter by jobId)
@@ -97,7 +122,7 @@ export const jobsApi = {
     studentId: string
   ): Promise<ApiResponse<JobApplication[]>> => {
     return apiClient.get<JobApplication[]>(
-      `/JobApplications?studentId=${encodeURIComponent(studentId)}`
+      `/JobApplications/student/${encodeURIComponent(studentId)}`
     );
   },
 

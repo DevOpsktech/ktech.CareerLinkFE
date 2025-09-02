@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { User, Search, Bookmark } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useApplications } from "../../hooks/useApllications";
@@ -16,7 +16,16 @@ import { JobSearch } from "../features/job-search/JobSearch";
 export function StudentDashboard() {
   const [activeTab, setActiveTab] = useState("jobs");
   const { user } = useAuth();
-  const { applications, loading, error } = useApplications(user?.id);
+  const studentId = user?.student?.id;
+
+  const { applications, loading, error, refetch } = useApplications(studentId);
+
+  // Refetch applications when switching to the applied tab
+  React.useEffect(() => {
+    if (activeTab === "applied" && user?.id) {
+      refetch();
+    }
+  }, [activeTab, user?.id, refetch]);
 
   const tabs = [
     { key: "jobs", label: "Find Jobs", icon: Search },
@@ -96,7 +105,7 @@ export function StudentDashboard() {
                           {application.job?.title || "Job Title"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {application.job?.company || "Company"}
+                          {application.job?.company?.name || "Company"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {formatDate(application.appliedAt)}

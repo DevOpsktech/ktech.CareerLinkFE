@@ -54,7 +54,11 @@ export default function JobDetailPage() {
   }) => {
     if (!user || !id) return;
 
-    const application = await applyToJob(id, user.id, applicationData);
+    const application = await applyToJob({
+      studentId: user.id,
+      jobId: id,
+      ...applicationData,
+    });
     if (application) {
       setShowApplicationModal(false);
       setApplicationSuccess(true);
