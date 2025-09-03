@@ -34,13 +34,10 @@ export const useJobs = () => {
       lastFetchRef.current = filterKey;
 
       try {
-        console.log("fetchAllJobs called with pageSize:", pageSize);
         const response = await jobsApi.getAllJobs(pageSize);
-        console.log("fetchAllJobs raw response:", response);
 
         // Parse the response using the utility function
         const parsedResponse = parseJobsResponse(response, pageSize);
-        console.log("fetchAllJobs parsed response:", parsedResponse);
 
         setJobs(parsedResponse.jobs);
         setPagination(parsedResponse.pagination);
@@ -73,16 +70,13 @@ export const useJobs = () => {
       lastFetchRef.current = filterKey;
 
       try {
-        console.log("fetchJobs called with filters:", searchFilters);
         const response = await jobsApi.getJobs(searchFilters);
-        console.log("fetchJobs raw response:", response);
 
         // Parse the response using the utility function
         const parsedResponse = parseJobsResponse(
           response,
           searchFilters.pageSize || 10
         );
-        console.log("fetchJobs parsed response:", parsedResponse);
 
         setJobs(parsedResponse.jobs);
         setPagination(parsedResponse.pagination);

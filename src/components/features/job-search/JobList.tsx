@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Loader from "../../ui/Loader";
+import ErrorBlock from "../../ui/ErrorBlock";
 import { JobCard } from "./JobCard";
 
 export function JobList({
@@ -11,17 +12,15 @@ export function JobList({
   onApply,
   applying,
   onViewDetails,
+  appliedJobIds,
 }: any) {
   if (error) {
     return (
-      <div className="text-center py-8">
-        <p className="text-red-600 mb-4">Error loading jobs: {error}</p>
-        <button
-          onClick={onRetry}
-          className="px-4 py-2 bg-teal-500 text-white rounded"
-        >
-          Try Again
-        </button>
+      <div className="py-4">
+        <ErrorBlock
+          message={`Error loading jobs: ${error}`}
+          onRetry={onRetry}
+        />
       </div>
     );
   }
@@ -35,16 +34,12 @@ export function JobList({
   }
 
   if (!jobs || jobs.length === 0) {
-    console.log("JobList: No jobs or empty jobs array:", jobs);
     return (
       <div className="text-center py-8">
         <p className="text-gray-600">No jobs found.</p>
       </div>
     );
   }
-  console.log("JobList: Jobs received:", jobs);
-  console.log("JobList: Jobs length:", jobs.length);
-  console.log("JobList: First job:", jobs[0]);
 
   return (
     <div className="space-y-4">
@@ -56,6 +51,7 @@ export function JobList({
           onViewDetails={() => onViewDetails(job.id)}
           onApply={() => onApply(job.id)}
           applying={applying}
+          hasApplied={appliedJobIds?.has?.(job.id)}
         />
       ))}
     </div>

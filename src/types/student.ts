@@ -65,6 +65,7 @@ export interface UpdateStudentProfileRequest {
   city?: string;
   state?: string;
   country?: string;
+  university?: string;
   major?: string;
   minor?: string;
   degreeLevel?: "associate" | "bachelor" | "master" | "phd";

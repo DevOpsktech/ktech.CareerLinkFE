@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../../contexts/AuthContext";
@@ -19,12 +19,23 @@ export function JobSearch() {
   const { user } = useAuth();
   const { jobs, loading, error, fetchJobs, fetchAllJobs, pagination } =
     useJobs();
-  const { applyToJob, loading: applyingToJob } = useApplications();
+
+  const studentId =
+    (user as unknown as { student?: { id?: string } })?.student?.id || user?.id;
+  const {
+    applications,
+    applyToJob,
+    loading: applyingToJob,
+  } = useApplications(studentId);
+
+  const appliedJobIds = useMemo(() => {
+    return new Set(applications.map((a) => a.jobId));
+  }, [applications]);
 
   // Fetch all jobs by default when component mounts
   useEffect(() => {
     fetchAllJobs(10);
-  }, []); // Only run once on mount
+  }, [fetchAllJobs]);
 
   const handleSearch = (searchFilters: JobSearchFilters) => {
     // Merge the search filters with existing filters
@@ -52,9 +63,10 @@ export function JobSearch() {
 
   const handleApplyToJob = async (jobId: string) => {
     if (!user || user.role !== "Student") return;
+    if (appliedJobIds.has(jobId)) return; // prevent duplicate apply
     await applyToJob({
       jobId,
-      studentId: user.id,
+      studentId: studentId as string,
       coverLetter: "I am interested in this position and would like to apply.",
     });
   };
@@ -84,6 +96,7 @@ export function JobSearch() {
         onRetry={() => fetchAllJobs(10)}
         onApply={handleApplyToJob}
         onViewDetails={(id: string) => navigate(`/jobs/${id}`)}
+        appliedJobIds={appliedJobIds}
       />
 
       <JobPagination

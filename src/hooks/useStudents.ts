@@ -6,6 +6,7 @@ import type {
   UpdateStudentProfileRequest,
 } from "../types/student";
 import { useToast } from "../contexts/ToastContext";
+import { cleanApiResponse } from "../utils/api";
 
 export const useStudents = (filters: StudentSearchFilters = {}) => {
   const [students, setStudents] = useState<Student[]>([]);
@@ -18,7 +19,7 @@ export const useStudents = (filters: StudentSearchFilters = {}) => {
     totalPages: 0,
   });
 
-  const { showSuccess, showError } = useToast();
+  const { showError } = useToast();
   const lastFetchRef = useRef<string>("");
   const isInitializedRef = useRef(false);
 
@@ -41,33 +42,105 @@ export const useStudents = (filters: StudentSearchFilters = {}) => {
           ...searchFilters,
         });
 
-        // Handle the new API response structure
-        const responseData = response.data || response;
+        const responseData =
+          (response as unknown as { data?: unknown }).data ?? response;
 
-        // Check if response is an array or has $values property
-        if (Array.isArray(responseData)) {
-          setStudents(responseData);
-        } else if (
-          responseData &&
-          typeof responseData === "object" &&
-          "$values" in responseData
-        ) {
-          setStudents((responseData as { $values: Student[] }).$values);
-        } else {
-          setStudents([]);
+        let parsedStudents: Student[] = [];
+        let newPagination = {
+          page: 1,
+          limit: (filters.limit || 10) as number,
+          total: 0,
+          totalPages: 0,
+        };
+
+        if (responseData && typeof responseData === "object") {
+          const obj = responseData as Record<string, unknown>;
+
+          // New .NET style: students.$values + top-level pagination
+          if (
+            "students" in obj &&
+            obj.students &&
+            typeof obj.students === "object" &&
+            "$values" in (obj.students as Record<string, unknown>) &&
+            Array.isArray((obj.students as Record<string, unknown>).$values)
+          ) {
+            parsedStudents = cleanApiResponse<Student[]>(
+              (obj.students as { $values: unknown[] }).$values
+            );
+
+            if ("totalCount" in obj) {
+              const totalCount =
+                (obj.totalCount as number) ?? parsedStudents.length;
+              const page = (obj.page as number) ?? 1;
+              const pageSize = (obj.pageSize as number) ?? newPagination.limit;
+              const totalPages =
+                (obj.totalPages as number) ?? Math.ceil(totalCount / pageSize);
+
+              newPagination = {
+                page,
+                limit: pageSize,
+                total: totalCount,
+                totalPages,
+              };
+            }
+          }
+          // Sometimes backend may respond with $values directly
+          else if (
+            "$values" in obj &&
+            Array.isArray((obj as { $values: unknown[] }).$values)
+          ) {
+            parsedStudents = cleanApiResponse<Student[]>(
+              (obj as { $values: unknown[] }).$values
+            );
+            newPagination = {
+              page: 1,
+              limit: newPagination.limit,
+              total: parsedStudents.length,
+              totalPages: Math.ceil(
+                parsedStudents.length / newPagination.limit
+              ),
+            };
+          }
+          // Legacy pagination wrapper
+          else if ("pagination" in obj && obj.pagination) {
+            // When legacy pagination exists, try to read data array
+            if (
+              "data" in obj &&
+              Array.isArray((obj as { data: unknown[] }).data)
+            ) {
+              parsedStudents = cleanApiResponse<Student[]>(
+                (obj as { data: unknown[] }).data
+              );
+            }
+            const p = obj.pagination as Record<string, number>;
+            newPagination = {
+              page: (p.page as number) || 1,
+              limit: (p.limit as number) || newPagination.limit,
+              total: (p.total as number) || parsedStudents.length,
+              totalPages:
+                (p.totalPages as number) ||
+                Math.ceil(
+                  ((p.total as number) || parsedStudents.length) /
+                    ((p.limit as number) || newPagination.limit)
+                ),
+            };
+          }
+          // Plain array
+          else if (Array.isArray(responseData)) {
+            parsedStudents = cleanApiResponse<Student[]>(responseData);
+            newPagination = {
+              page: 1,
+              limit: newPagination.limit,
+              total: parsedStudents.length,
+              totalPages: Math.ceil(
+                parsedStudents.length / newPagination.limit
+              ),
+            };
+          }
         }
 
-        // Handle pagination if available
-        if (
-          responseData &&
-          typeof responseData === "object" &&
-          "pagination" in responseData
-        ) {
-          setPagination(
-            (responseData as { pagination: typeof pagination }).pagination
-          );
-        }
-
+        setStudents(parsedStudents);
+        setPagination(newPagination);
         isInitializedRef.current = true;
       } catch (err) {
         const errorMessage =
@@ -103,9 +176,12 @@ export const useStudent = (id?: string, userId?: string) => {
   const lastFetchRef = useRef<string>("");
 
   const fetchStudent = useCallback(async () => {
-    if (!id && !userId) return;
+    // Support fetching current student's profile (by auth token)
+    const isProfileFetch = !id && !userId;
 
-    const fetchKey = id || userId || "";
+    if (!id && !userId && !isProfileFetch) return;
+
+    const fetchKey = id || userId || "profile";
 
     // Prevent duplicate requests
     if (lastFetchRef.current === fetchKey) {
@@ -119,11 +195,14 @@ export const useStudent = (id?: string, userId?: string) => {
     try {
       const response = id
         ? await studentsApi.getStudentById(id)
-        : await studentsApi.getStudentByUserId(userId!);
+        : userId
+        ? await studentsApi.getStudentByUserId(userId)
+        : await studentsApi.getStudentProfile();
 
-      // Handle the new API response structure
-      const responseData = response.data || response;
-      setStudent(responseData as Student);
+      const responseData =
+        (response as unknown as { data?: unknown }).data ?? response;
+      const cleaned = cleanApiResponse<Student>(responseData);
+      setStudent(cleaned);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to fetch student";
@@ -145,10 +224,10 @@ export const useStudent = (id?: string, userId?: string) => {
 
       try {
         const response = await studentsApi.updateStudentProfile(profileData);
-        const responseData = response.data || response;
-        const updatedStudent = responseData as Student;
+        const responseData =
+          (response as unknown as { data?: unknown }).data ?? response;
+        const updatedStudent = cleanApiResponse<Student>(responseData);
 
-        // Optimistically update the student
         setStudent(updatedStudent);
 
         showSuccess("Profile updated successfully!");
@@ -183,10 +262,10 @@ export const useStudent = (id?: string, userId?: string) => {
           student.id,
           skillData
         );
-        const responseData = response.data || response;
-        const updatedStudent = responseData as Student;
+        const responseData =
+          (response as unknown as { data?: unknown }).data ?? response;
+        const updatedStudent = cleanApiResponse<Student>(responseData);
 
-        // Optimistically update the student
         setStudent(updatedStudent);
 
         showSuccess("Skill added successfully!");
@@ -216,10 +295,10 @@ export const useStudent = (id?: string, userId?: string) => {
           student.id,
           skillId
         );
-        const responseData = response.data || response;
-        const updatedStudent = responseData as Student;
+        const responseData =
+          (response as unknown as { data?: unknown }).data ?? response;
+        const updatedStudent = cleanApiResponse<Student>(responseData);
 
-        // Optimistically update the student
         setStudent(updatedStudent);
 
         showSuccess("Skill removed successfully!");
@@ -251,10 +330,10 @@ export const useStudent = (id?: string, userId?: string) => {
           student.id,
           experienceData
         );
-        const responseData = response.data || response;
-        const updatedStudent = responseData as Student;
+        const responseData =
+          (response as unknown as { data?: unknown }).data ?? response;
+        const updatedStudent = cleanApiResponse<Student>(responseData);
 
-        // Optimistically update the student
         setStudent(updatedStudent);
 
         showSuccess("Experience added successfully!");

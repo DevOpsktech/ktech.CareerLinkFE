@@ -12,6 +12,7 @@ import {
 } from "../../utils/reusables";
 import Loader from "../ui/Loader";
 import { JobSearch } from "../features/job-search/JobSearch";
+import ErrorBlock from "../ui/ErrorBlock";
 
 export function StudentDashboard() {
   const [activeTab, setActiveTab] = useState("jobs");
@@ -65,10 +66,11 @@ export function StudentDashboard() {
                 <Loader text="Loading applications..." />
               </div>
             ) : error ? (
-              <div className="text-center py-8">
-                <p className="text-red-600">
-                  Error loading applications: {error}
-                </p>
+              <div className="p-6">
+                <ErrorBlock
+                  message={`Error loading applications: ${error}`}
+                  onRetry={refetch}
+                />
               </div>
             ) : applications.length === 0 ? (
               <div className="text-center py-8">

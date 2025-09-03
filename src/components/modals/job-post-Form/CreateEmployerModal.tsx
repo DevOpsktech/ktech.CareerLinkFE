@@ -45,10 +45,8 @@ export function CreateEmployerModal({
     const fetchCompanies = async () => {
       try {
         const response = await companyApi.getCompanies({ limit: 100 });
-        console.log("Companies API response:", response);
         // The response should be a PaginatedResponse with data property containing the array
         const companiesData = response?.data || [];
-        console.log("Companies data:", companiesData);
         setCompanies(Array.isArray(companiesData) ? companiesData : []);
       } catch (error) {
         console.error("Failed to fetch companies:", error);
@@ -101,11 +99,6 @@ export function CreateEmployerModal({
     e.preventDefault();
     if (validateForm()) onSubmit(formData);
   };
-
-  // Debug log to see companies state
-  console.log("Current companies state:", companies);
-  console.log("Companies length:", companies.length);
-  console.log("First company:", companies[0]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

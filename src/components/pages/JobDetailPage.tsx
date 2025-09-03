@@ -31,11 +31,14 @@ export default function JobDetailPage() {
   const { user } = useAuth();
   const { job, loading, error } = useJob(id!);
 
+  const studentId =
+    (user as unknown as { student?: { id?: string } })?.student?.id || user?.id;
+
   const {
     applications,
     applyToJob,
     loading: applyingToJob,
-  } = useApplications();
+  } = useApplications(studentId);
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [applicationSuccess, setApplicationSuccess] = useState(false);
 
@@ -45,7 +48,7 @@ export default function JobDetailPage() {
 
   // Check if user has already applied to this job
   const hasApplied = applications.some(
-    (app) => app.jobId === id && app.studentId === user?.id
+    (app) => app.jobId === id && app.studentId === studentId
   );
 
   const handleApply = async (applicationData: {
@@ -55,7 +58,7 @@ export default function JobDetailPage() {
     if (!user || !id) return;
 
     const application = await applyToJob({
-      studentId: user.id,
+      studentId: studentId as string,
       jobId: id,
       ...applicationData,
     });
@@ -160,7 +163,7 @@ export default function JobDetailPage() {
             <CompanyInfo job={job} />
 
             {/* Share Job */}
-            <ShareJob job={job} />
+            {/* <ShareJob job={job} /> */}
           </div>
         </div>
       </div>

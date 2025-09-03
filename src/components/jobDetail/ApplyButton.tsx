@@ -10,10 +10,9 @@ export default function ApplyButton({
   if (user?.role !== "Student") return null;
 
   return hasApplied ? (
-    <div className="flex items-center text-green-600 bg-green-50 px-4 py-2 rounded-lg">
-      <CheckCircle className="w-5 h-5 mr-2" />
-      <span className="font-medium">Applied</span>
-    </div>
+    <Button variant="secondary" size="lg" disabled className="w-full lg:w-auto">
+      Already applied
+    </Button>
   ) : (
     <Button
       onClick={onApplyClick}

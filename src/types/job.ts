@@ -116,8 +116,8 @@ export interface JobApplication {
 }
 export interface CreateJobRequest {
   title: string;
-  employerId: string;
-  companyId: string;
+  employerId?: string;
+  companyId?: string;
   description: string;
   requirements: string[];
   responsibilities?: string[];

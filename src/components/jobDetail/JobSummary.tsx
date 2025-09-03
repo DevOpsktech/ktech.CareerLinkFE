@@ -23,23 +23,25 @@ export default function JobSummary({
             {String(job.experienceLevel).toLowerCase()}
           </dd>
         </div>
-        <div>
-          <dt className="text-sm font-medium text-gray-500">Location</dt>
-          <dd className="text-sm text-gray-900 mt-1">
-            {job.location}
-            {job.isRemote && (
-              <span className="block text-green-600">
-                Remote work available
-              </span>
-            )}
-          </dd>
-        </div>
-        {(job.salary || job.salaryMin != null || job.salaryMax != null) && (
+        {job.location && (
+          <div>
+            <dt className="text-sm font-medium text-gray-500">Location</dt>
+            <dd className="text-sm text-gray-900 mt-1">
+              {job.location}
+              {job.isRemote && (
+                <span className="block text-green-600">
+                  Remote work available
+                </span>
+              )}
+            </dd>
+          </div>
+        )}
+        {/* {(job.salary || job.salaryMin != null || job.salaryMax != null) && (
           <div>
             <dt className="text-sm font-medium text-gray-500">Salary</dt>
             <dd className="text-sm text-gray-900 mt-1">{formatSalary(job)}</dd>
           </div>
-        )}
+        )} */}
         <div>
           <dt className="text-sm font-medium text-gray-500">Posted</dt>
           <dd className="text-sm text-gray-900 mt-1">

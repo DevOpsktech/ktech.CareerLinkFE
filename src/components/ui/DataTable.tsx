@@ -15,6 +15,11 @@ interface DataTableProps {
   data: any[];
   showActions?: boolean;
   employerActions?: boolean;
+  editJobs?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onEdit?: (row: any) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onDelete?: (row: any) => void;
 }
 
 export function DataTable({
@@ -22,6 +27,9 @@ export function DataTable({
   data,
   showActions = false,
   employerActions = false,
+  editJobs = false,
+  onEdit,
+  onDelete,
 }: DataTableProps) {
   const navigate = useNavigate();
   return (
@@ -83,14 +91,22 @@ export function DataTable({
                     >
                       <Eye size={16} />
                     </button>
-                    {employerActions && (
-                      <button className="text-green-600 hover:text-green-800 p-1 rounded transition-colors">
+                    {editJobs && (
+                      <button
+                        onClick={() => onEdit && onEdit(row)}
+                        className="text-green-600 hover:text-green-800 p-1 rounded transition-colors"
+                      >
                         <Edit size={16} />
                       </button>
                     )}
-                    <button className="text-red-600 hover:text-red-800 p-1 rounded transition-colors">
-                      <Trash2 size={16} />
-                    </button>
+                    {onDelete && (
+                      <button
+                        onClick={() => onDelete && onDelete(row)}
+                        className="text-red-600 hover:text-red-800 p-1 rounded transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
                   </div>
                 </td>
               )}

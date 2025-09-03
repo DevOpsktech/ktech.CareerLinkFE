@@ -15,13 +15,6 @@ export function parseJobsResponse(
   response: any,
   defaultPageSize: number = 10
 ): ParsedJobsResponse {
-  console.log("parseJobsResponse called with:", response);
-  console.log("Response type:", typeof response);
-  console.log(
-    "Response keys:",
-    response ? Object.keys(response) : "null/undefined"
-  );
-
   let jobs: Job[] = [];
   let pagination = {
     page: 1,
@@ -31,20 +24,17 @@ export function parseJobsResponse(
   };
 
   if (!response || typeof response !== "object") {
-    console.log("Response is null/undefined or not an object, returning empty");
     return { jobs, pagination };
   }
 
   // Handle ApiResponse wrapper from apiClient
   let actualResponse = response;
   if ("data" in response && response.data !== undefined) {
-    console.log("Found ApiResponse wrapper, extracting data");
     actualResponse = response.data;
   }
 
   // Check for the new search response structure with items
   if ("items" in actualResponse && Array.isArray(actualResponse.items)) {
-    console.log("Found items structure");
     jobs = cleanApiResponse(actualResponse.items) as Job[];
     pagination = {
       page: actualResponse.pagination?.page || 1,
@@ -63,7 +53,6 @@ export function parseJobsResponse(
     "$values" in actualResponse &&
     Array.isArray(actualResponse.$values)
   ) {
-    console.log("Found $values structure");
     jobs = cleanApiResponse(actualResponse.$values) as Job[];
     pagination = {
       page: 1,
@@ -80,7 +69,6 @@ export function parseJobsResponse(
     "$values" in actualResponse.jobs &&
     Array.isArray(actualResponse.jobs.$values)
   ) {
-    console.log("Found jobs.$values structure");
     jobs = cleanApiResponse(actualResponse.jobs.$values) as Job[];
     if (
       "totalCount" in actualResponse &&
@@ -101,7 +89,6 @@ export function parseJobsResponse(
   }
   // Check for legacy pagination structure
   else if ("pagination" in actualResponse && actualResponse.pagination) {
-    console.log("Found legacy pagination structure");
     if ("data" in actualResponse && Array.isArray(actualResponse.data)) {
       jobs = cleanApiResponse(actualResponse.data) as Job[];
     }
@@ -119,7 +106,6 @@ export function parseJobsResponse(
   }
   // Fallback to array of jobs
   else if (Array.isArray(actualResponse)) {
-    console.log("Found array structure");
     jobs = cleanApiResponse(actualResponse) as Job[];
     pagination = {
       page: 1,
@@ -134,6 +120,5 @@ export function parseJobsResponse(
     );
   }
 
-  console.log("Parsed result:", { jobs, pagination });
   return { jobs, pagination };
 }

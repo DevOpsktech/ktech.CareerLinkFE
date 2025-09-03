@@ -79,6 +79,7 @@ export const useApplications = (studentId?: string, jobId?: string) => {
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to apply to job";
+
         setError(errorMessage);
         showError(errorMessage);
         return null;

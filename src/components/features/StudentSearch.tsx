@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, Filter, Download, Star } from "lucide-react";
+import { Search, Download, Star } from "lucide-react";
 import { Button } from "../ui/Button";
 import { useStudents } from "../../hooks/useStudents";
 import type { StudentSearchFilters } from "../../types/student";
@@ -127,21 +127,6 @@ export function StudentSearch() {
                 <option value="2026">2026</option>
                 <option value="2027">2027</option>
               </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Skills
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. JavaScript, Marketing"
-                value={filters.skills}
-                onChange={(e) =>
-                  setFilters({ ...filters, skills: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
             </div>
           </div>
         </form>

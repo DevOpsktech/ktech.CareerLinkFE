@@ -7,11 +7,22 @@ import { useEmployers } from "../../hooks/useEmployers";
 import { useStudents } from "../../hooks/useStudents";
 import { Briefcase, GraduationCap, Users } from "lucide-react";
 import CompanyTable from "../features/CompanyTable";
+import { useState } from "react";
+import { ConfirmModal } from "../ui/ConfirmModal";
+import { jobsApi } from "../../api/jobsApi";
+import { useToast } from "../../contexts/ToastContext";
 
 export function AdminDashboard() {
-  const { jobs } = useJobs();
+  const { jobs, refetch } = useJobs();
   const { employers } = useEmployers();
   const { students } = useStudents();
+  const { showSuccess, showError } = useToast();
+
+  const [jobPendingDelete, setJobPendingDelete] = useState<{
+    id: string;
+    title?: string;
+  } | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const totalJobs = jobs.length;
   const totalEmployers = employers.length;
@@ -58,6 +69,26 @@ export function AdminDashboard() {
     { key: "postedDate", label: "Posted Date" },
   ];
 
+  const handleRequestDelete = (row: { id: string; title?: string }) => {
+    setJobPendingDelete({ id: row.id, title: row.title });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!jobPendingDelete || deleting) return;
+    try {
+      setDeleting(true);
+      await jobsApi.deleteJob(jobPendingDelete.id);
+      showSuccess("Job deleted successfully");
+      setJobPendingDelete(null);
+      refetch();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to delete job";
+      showError(message);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <Heading title="Admin Dashboard" />
@@ -82,12 +113,29 @@ export function AdminDashboard() {
             columns={adminJobColumns}
             data={transformedJobsData}
             showActions
+            onDelete={handleRequestDelete}
           />
         </div>{" "}
         <div className="">
           <CompanyTable />
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={Boolean(jobPendingDelete)}
+        title="Delete Job"
+        message={
+          jobPendingDelete
+            ? `Are you sure you want to delete "${
+                jobPendingDelete.title || "this job"
+              }"? This action cannot be undone.`
+            : "Are you sure you want to delete this job? This action cannot be undone."
+        }
+        confirmText={deleting ? "Deleting..." : "Delete"}
+        cancelText={"Cancel"}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => (!deleting ? setJobPendingDelete(null) : undefined)}
+      />
     </div>
   );
 }

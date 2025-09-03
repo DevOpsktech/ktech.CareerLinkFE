@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { JobApplication } from "../../types/job";
 import Loader from "../ui/Loader";
+import ErrorBlock from "../ui/ErrorBlock";
 import { useToast } from "../../contexts/ToastContext";
 import { ApplicantDetailModal } from "./ApplicantDetailModal";
 import { useEmployerJobApplicants } from "../../hooks/useEmployerJobApplicants";
@@ -54,8 +55,8 @@ export function JobapplicationsList({
 
   if (error) {
     return (
-      <div className="text-center py-8">
-        <p className="text-red-600 mb-4">{error}</p>
+      <div className="py-6">
+        <ErrorBlock message={error} onRetry={refetch} />
       </div>
     );
   }

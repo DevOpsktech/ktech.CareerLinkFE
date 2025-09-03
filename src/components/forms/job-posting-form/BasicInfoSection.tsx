@@ -21,19 +21,6 @@ export default function BasicInfoSection({
       options: [
         { value: "full-time", label: "Full-time" },
         { value: "part-time", label: "Part-time" },
-        { value: "internship", label: "Internship" },
-      ],
-    },
-    {
-      id: "experienceLevel",
-      label: "Experience Level",
-      type: "select" as const,
-      required: true,
-      options: [
-        { value: "entry", label: "Entry Level" },
-        { value: "junior", label: "Junior" },
-        { value: "mid", label: "Mid Level" },
-        { value: "senior", label: "Senior" },
       ],
     },
     {

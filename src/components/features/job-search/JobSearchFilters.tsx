@@ -1,15 +1,8 @@
 import { useState, useEffect } from "react";
-import { Search, Filter, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import type { JobSearchFilters } from "../../../types/job";
 import { Button } from "../../ui/Button";
-import {
-  jobTypeOptions,
-  experienceLevelOptions,
-  jobStatusOptions,
-  sortByOptions,
-  sortOrderOptions,
-  pageSizeOptions,
-} from "../../../constants";
+import { jobTypeOptions } from "../../../constants";
 
 interface Props {
   searchQuery?: string;
@@ -26,7 +19,6 @@ export function JobSearchFilters({
   onFilterChange,
   onSubmit,
 }: Props) {
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [localFilters, setLocalFilters] = useState<JobSearchFilters>(filters);
   const [selectedSkills, setSelectedSkills] = useState<string[]>(
     filters.skills || []
@@ -57,12 +49,6 @@ export function JobSearchFilters({
       pageSize: localFilters.pageSize || 10,
     };
     onSubmit(searchFilters);
-  };
-
-  const handleSkillToggle = (skill: string) => {
-    setSelectedSkills((prev) =>
-      prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill]
-    );
   };
 
   const clearFilters = () => {
@@ -131,53 +117,34 @@ export function JobSearchFilters({
         </div>
 
         {/* Advanced Filters Toggle */}
-        <div className="pt-4 border-t border-gray-100">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className="flex items-center gap-2"
-          >
-            <Filter size={16} />
-            {showAdvancedFilters ? "Hide" : "Show"} Advanced Filters
-          </Button>
-        </div>
 
-        {/* Advanced Filters */}
-        {showAdvancedFilters && (
-          <div className="space-y-4 pt-4 border-t border-gray-100">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Job Type */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Job Type
-                </label>
-                <select
-                  value={localFilters.type || ""}
-                  onChange={(e) =>
-                    setLocalFilters({
-                      ...localFilters,
-                      type: e.target.value as
-                        | "full-time"
-                        | "part-time"
-                        | "internship"
-                        | "contract"
-                        | undefined,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
-                >
-                  <option value="">All Types</option>
-                  {jobTypeOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Job Type */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Job Type
+            </label>
+            <select
+              value={localFilters.type || ""}
+              onChange={(e) =>
+                setLocalFilters({
+                  ...localFilters,
+                  type: e.target.value as "full-time" | "part-time" | undefined,
+                })
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+            >
+              <option value="">All Types</option>
+              {jobTypeOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
-              {/* Experience Level */}
-              <div>
+          {/* Experience Level */}
+          {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Experience Level
                 </label>
@@ -203,10 +170,10 @@ export function JobSearchFilters({
                     </option>
                   ))}
                 </select>
-              </div>
-            </div>
-            {/* Salary Range */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              </div> */}
+        </div>
+        {/* Salary Range */}
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Min Salary
@@ -241,10 +208,10 @@ export function JobSearchFilters({
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
                 />
               </div>
-            </div>
+            </div> */}
 
-            {/* Company and Status */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Company and Status */}
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Job Status
@@ -271,9 +238,7 @@ export function JobSearchFilters({
                   ))}
                 </select>
               </div>
-            </div>
-          </div>
-        )}
+            </div> */}
       </form>
     </div>
   );

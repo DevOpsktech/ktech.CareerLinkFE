@@ -9,13 +9,24 @@ import Loader from "../ui/Loader";
 import { JobPostingForm } from "../forms/job-posting-form/JobPostingForm";
 import { Button } from "../ui/Button";
 import { JobapplicationsList } from "../features/JobApplicantsList";
+import UpdateJobModal from "../modals/job-post-Form/UpdateJobModal";
 import { useAuth } from "../../contexts/AuthContext";
+import { ConfirmModal } from "../ui/ConfirmModal";
+import { useToast } from "../../contexts/ToastContext";
+import { jobsApi } from "../../api/jobsApi";
 
 export function EmployerDashboard() {
   const [activeTab, setActiveTab] = useState("jobs");
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [editingJobId, setEditingJobId] = useState<string | null>(null);
   const { user } = useAuth();
   const { jobs, loading, error, refetch } = useEmployerJobs(user?.id || null);
+  const { showSuccess, showError } = useToast();
+  const [jobPendingDelete, setJobPendingDelete] = useState<{
+    id: string;
+    title?: string;
+  } | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const handleBackToJobs = () => {
     setSelectedJobId(null);
@@ -39,7 +50,7 @@ export function EmployerDashboard() {
   const transformedJobsData = jobs.map((job) => ({
     id: job.id,
     title: job.title,
-    applications: job.applicationCount || 0,
+    applications: job.applicationCount || "0",
     status: job.status || "Active",
     posted: job.postedDate
       ? new Date(job.postedDate).toLocaleDateString()
@@ -47,6 +58,32 @@ export function EmployerDashboard() {
     location: job.location || "N/A",
     type: job.type || "N/A",
   }));
+
+  const handleEditJob = (row: { id: string }) => {
+    setEditingJobId(row.id);
+  };
+
+  const handleRequestDelete = (row: { id: string; title?: string }) => {
+    setJobPendingDelete({ id: row.id, title: row.title });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!jobPendingDelete || deleting) return;
+    try {
+      setDeleting(true);
+      await jobsApi.deleteJob(jobPendingDelete.id);
+      showSuccess("Job deleted successfully");
+      setJobPendingDelete(null);
+      refetch();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to delete job";
+      showError(message);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const editingJob = jobs.find((j) => j.id === editingJobId) || null;
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -149,36 +186,15 @@ export function EmployerDashboard() {
                 <p className="text-gray-600 text-lg font-medium">
                   No jobs posted yet
                 </p>
-                <p className="text-gray-500 text-sm mt-1 mb-4">
-                  Start building your team by posting your first job
-                  opportunity.
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={() => setActiveTab("post")}
-                  className="flex items-center space-x-2"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  <span>Post Your First Job</span>
-                </Button>
               </div>
             ) : (
               <DataTable
                 columns={enhancedMyJobsColumns}
                 data={transformedJobsData}
                 showActions={true}
+                editJobs={true}
+                onEdit={handleEditJob}
+                onDelete={handleRequestDelete}
               />
             )}
           </div>
@@ -210,6 +226,32 @@ export function EmployerDashboard() {
 
         {activeTab === "students" && <StudentSearch />}
       </div>
+
+      <UpdateJobModal
+        isOpen={Boolean(editingJobId)}
+        job={editingJob}
+        onClose={() => setEditingJobId(null)}
+        onUpdated={() => {
+          setEditingJobId(null);
+          refetch();
+        }}
+      />
+
+      <ConfirmModal
+        isOpen={Boolean(jobPendingDelete)}
+        title="Delete Job"
+        message={
+          jobPendingDelete
+            ? `Are you sure you want to delete "${
+                jobPendingDelete.title || "this job"
+              }"? This action cannot be undone.`
+            : "Are you sure you want to delete this job? This action cannot be undone."
+        }
+        confirmText={deleting ? "Deleting..." : "Delete"}
+        cancelText={"Cancel"}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => (!deleting ? setJobPendingDelete(null) : undefined)}
+      />
     </div>
   );
 }

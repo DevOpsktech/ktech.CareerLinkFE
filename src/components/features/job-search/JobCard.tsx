@@ -13,6 +13,7 @@ interface JobCardProps {
   onViewDetails: () => void;
   onApply: () => void;
   applying: boolean;
+  hasApplied?: boolean;
 }
 
 export function JobCard({
@@ -21,6 +22,7 @@ export function JobCard({
   onViewDetails,
   onApply,
   applying,
+  hasApplied,
 }: JobCardProps) {
   // Helper function to safely render values
   const safeRender = (value: any, fallback: string = "N/A"): string => {
@@ -28,11 +30,9 @@ export function JobCard({
     if (typeof value === "string") return value;
     if (typeof value === "number") return value.toString();
     if (typeof value === "object" && value.$ref) {
-      // console.warn("Found unresolved reference:", value);
       return fallback;
     }
     if (typeof value === "object") {
-      // console.warn("Found object where string expected:", value);
       return fallback;
     }
     return String(value);
@@ -64,10 +64,10 @@ export function JobCard({
               <Clock size={16} className="mr-1" />
               {formatJobType(job.type)}
             </div>
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
               <DollarSign size={16} className="mr-1" />
               {formatSalary(job)}
-            </div>
+            </div> */}
           </div>
           <p className="text-gray-700 mb-3">
             {safeRender(job.description, "No description available")}
@@ -99,17 +99,27 @@ export function JobCard({
           >
             View Details
           </Button>
-          {user?.role === "Student" && (
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={onApply}
-              disabled={applying}
-              className="w-full md:w-auto"
-            >
-              {applying ? "Applying..." : "Quick Apply"}
-            </Button>
-          )}
+          {user?.role === "Student" &&
+            (hasApplied ? (
+              <Button
+                variant="secondary"
+                size="md"
+                disabled
+                className="w-full md:w-auto"
+              >
+                Already applied
+              </Button>
+            ) : (
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={onApply}
+                disabled={applying}
+                className="w-full md:w-auto"
+              >
+                {applying ? "Applying..." : "Quick Apply"}
+              </Button>
+            ))}
         </div>
       </div>
     </div>

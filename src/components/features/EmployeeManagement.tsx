@@ -44,7 +44,6 @@ export function EmployerManagement() {
       employer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       employer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  console.log(employers);
 
   const columns = [
     {

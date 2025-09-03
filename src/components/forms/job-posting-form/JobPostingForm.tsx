@@ -3,7 +3,7 @@ import { useJobs } from "../../../hooks/useJobs";
 import type { CreateJobRequest } from "../../../types/job";
 import BasicInfoSection from "./BasicInfoSection";
 import LocationSection from "./LocationSection";
-import SalarySection from "./SalarySection";
+// import SalarySection from "./SalarySection";
 import { SkillsSection } from "./SkillSection";
 import { DescriptionSection } from "./DescriptionSection";
 import { ResponsibilitiesSection } from "./ResponsibilitiesSection";
@@ -18,6 +18,7 @@ interface JobPostingFormProps {
 export function JobPostingForm({ onJobCreated }: JobPostingFormProps) {
   const { createJob, loading } = useJobs();
   const { user } = useAuth();
+
   const company_id = user?.employer?.company?.id;
   const employer_id = user?.employer?.id;
 
@@ -119,7 +120,7 @@ export function JobPostingForm({ onJobCreated }: JobPostingFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6">
       <BasicInfoSection formData={formData} onChange={handleChange} />
       <LocationSection formData={formData} onChange={handleChange} />
-      <SalarySection formData={formData} onChange={handleChange} />
+      {/* <SalarySection formData={formData} onChange={handleChange} /> */}
       <SkillsSection formData={formData} onChange={handleChange} />
       <DescriptionSection formData={formData} onChange={handleChange} />
       <ResponsibilitiesSection formData={formData} onChange={handleChange} />

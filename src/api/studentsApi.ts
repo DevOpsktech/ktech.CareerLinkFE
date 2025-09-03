@@ -24,26 +24,31 @@ export const studentsApi = {
     if (filters.limit) params.set("limit", String(filters.limit));
 
     const response = await apiClient.get<PaginatedResponse<Student>>(
-      `/student/all?${params.toString()}`
+      `/Student/search?${params.toString()}`
     );
     return response as unknown as PaginatedResponse<Student>;
   },
 
   // Get student by ID
   getStudentById: async (id: string): Promise<ApiResponse<Student>> => {
-    return apiClient.get<Student>(`/students/${id}`);
+    return apiClient.get<Student>(`/Student/${id}`);
+  },
+
+  // Get current student's profile (by token)
+  getStudentProfile: async (): Promise<ApiResponse<Student>> => {
+    return apiClient.get<Student>(`/Student/profile`);
   },
 
   // Get student by user ID
   getStudentByUserId: async (userId: string): Promise<ApiResponse<Student>> => {
-    return apiClient.get<Student>(`/students/by-user/${userId}`);
+    return apiClient.get<Student>(`/Student/${userId}`);
   },
 
   // Update student profile
   updateStudentProfile: async (
     profileData: UpdateStudentProfileRequest
   ): Promise<ApiResponse<Student>> => {
-    return apiClient.put<Student>(`/student/profile`, profileData);
+    return apiClient.put<Student>(`/Student/profile`, profileData);
   },
 
   // Add student skill

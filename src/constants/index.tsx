@@ -145,8 +145,6 @@ export const studentTabs = [
 export const jobTypeOptions = [
   { value: "full-time", label: "Full-time" },
   { value: "part-time", label: "Part-time" },
-  { value: "internship", label: "Internship" },
-  { value: "contract", label: "Contract" },
 ];
 
 export const experienceLevelOptions = [
