@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Search, Download, Star } from "lucide-react";
+import { Search, Star, Eye } from "lucide-react";
 import { Button } from "../ui/Button";
 import { useStudents } from "../../hooks/useStudents";
 import type { StudentSearchFilters } from "../../types/student";
 import Loader from "../ui/Loader";
+import { employersApi } from "../../api/employerApi";
+import { useToast } from "../../contexts/ToastContext";
 
 export function StudentSearch() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -12,8 +14,10 @@ export function StudentSearch() {
     graduationYear: "",
     skills: "",
   });
+  const [viewingCvIds, setViewingCvIds] = useState<Set<string>>(new Set());
 
   const { students, loading, error, fetchStudents } = useStudents();
+  const { showError } = useToast();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,18 +38,36 @@ export function StudentSearch() {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleDownloadCV = (student: any) => {
-    if (student.cvUrl) {
+  const handleViewCV = async (student: any) => {
+    if (!student.cvUrl) {
+      showError("CV not available for this student");
+      return;
+    }
+
+    setViewingCvIds((prev) => new Set([...prev, student.id]));
+
+    try {
+      // Record the CV view
+      await employersApi.recordCvView(student.id);
+
+      // Open the CV
       window.open(student.cvUrl, "_blank");
-    } else {
-      alert("CV not available for this student");
+    } catch (error) {
+      console.error("Failed to record CV view:", error);
+      window.open(student.cvUrl, "_blank");
+    } finally {
+      setViewingCvIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(student.id);
+        return newSet;
+      });
     }
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleShortlist = (student: any) => {
     // This would typically call an API to add to shortlist
-    alert(`${student.name} has been added to your shortlist!`);
+    alert(`${student.fullName} has been added to your shortlist!`);
   };
 
   if (error) {
@@ -221,10 +243,20 @@ export function StudentSearch() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleDownloadCV(student)}
+                        onClick={() => handleViewCV(student)}
+                        disabled={viewingCvIds.has(student.id)}
                       >
-                        <Download size={14} className="mr-1" />
-                        View CV
+                        {viewingCvIds.has(student.id) ? (
+                          <>
+                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current mr-1"></div>
+                            Loading...
+                          </>
+                        ) : (
+                          <>
+                            <Eye size={14} className="mr-1" />
+                            View CV
+                          </>
+                        )}
                       </Button>
                       <Button
                         variant="secondary"

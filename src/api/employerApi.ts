@@ -80,4 +80,16 @@ export const employersApi = {
   ): Promise<ApiResponse<JobApplication[]>> => {
     return apiClient.get<JobApplication[]>(`/Employer/job/${jobId}/applicants`);
   },
+
+  // ----------------------
+  // CV Views
+  // ----------------------
+
+  // Record CV view for a student
+  recordCvView: async (studentId: string): Promise<ApiResponse<boolean>> => {
+    return apiClient.post<boolean>(
+      `/Employer/students/${studentId}/view-cv`,
+      {}
+    );
+  },
 };

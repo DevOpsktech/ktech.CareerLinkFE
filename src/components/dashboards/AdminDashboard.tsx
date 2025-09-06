@@ -1,6 +1,7 @@
 import { DataTable } from "../ui/DataTable";
 import { StatCard } from "../ui/StatsCard";
 import { EmployerManagement } from "../features/EmployeeManagement";
+import { CvViewsManagement } from "../features/CvViewsManagement";
 import Heading from "../ui/Heading";
 import { useJobs } from "../../hooks/useJobs";
 import { useEmployers } from "../../hooks/useEmployers";
@@ -115,7 +116,8 @@ export function AdminDashboard() {
             showActions
             onDelete={handleRequestDelete}
           />
-        </div>{" "}
+        </div>
+        <CvViewsManagement />
         <div className="">
           <CompanyTable />
         </div>
