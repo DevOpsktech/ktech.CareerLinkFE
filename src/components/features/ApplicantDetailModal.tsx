@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import type { JobApplication } from "../../types/job";
 import { Button } from "../ui/Button";
-import { Badge } from "../ui/Badge";
 import { useToast } from "../../contexts/ToastContext";
 
 interface ApplicantDetailModalProps {
@@ -25,31 +24,6 @@ export function ApplicantDetailModal({
 
   if (!isOpen) return null;
 
-  const getStatusColor = (status: JobApplication["status"]) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "reviewing":
-        return "bg-blue-100 text-blue-800";
-      case "shortlisted":
-        return "bg-green-100 text-green-800";
-      case "interview_scheduled":
-        return "bg-purple-100 text-purple-800";
-      case "interviewed":
-        return "bg-indigo-100 text-indigo-800";
-      case "offered":
-        return "bg-emerald-100 text-emerald-800";
-      case "accepted":
-        return "bg-green-100 text-green-800";
-      case "rejected":
-        return "bg-red-100 text-red-800";
-      case "withdrawn":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -70,6 +44,7 @@ export function ApplicantDetailModal({
       onClose();
     } catch (error) {
       showError("Failed to update application status");
+      console.error(error);
     } finally {
       setUpdating(false);
     }

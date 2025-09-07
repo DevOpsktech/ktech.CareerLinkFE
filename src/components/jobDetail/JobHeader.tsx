@@ -1,16 +1,7 @@
-import {
-  Building,
-  MapPin,
-  Clock,
-  DollarSign,
-  Calendar,
-  Users,
-  Eye,
-} from "lucide-react";
+import { Building, MapPin, Clock, Calendar } from "lucide-react";
 
 export default function JobHeader({
   job,
-  formatSalary,
   formatJobType,
   formatPostedDate,
   formatDeadline,

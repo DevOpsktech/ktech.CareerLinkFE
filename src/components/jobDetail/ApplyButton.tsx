@@ -1,4 +1,3 @@
-import { CheckCircle } from "lucide-react";
 import { Button } from "../ui/Button";
 
 export default function ApplyButton({

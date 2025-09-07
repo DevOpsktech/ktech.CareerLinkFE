@@ -1,6 +1,5 @@
 export default function JobSummary({
   job,
-  formatSalary,
   formatJobType,
   formatPostedDate,
   formatDeadline,

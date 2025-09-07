@@ -20,7 +20,6 @@ import {
   JobResponsibilities,
   ApplyButton,
   SuccessMessage,
-  ShareJob,
   CompanyInfo,
 } from "../jobDetail";
 import JobNotFound from "../jobDetail/JobNotFound";

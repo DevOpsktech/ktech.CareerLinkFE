@@ -1,29 +1,6 @@
 import type { ApiResponse } from "../types/api";
 
-export const API_BASE_URL = "http://localhost:5000/api";
-const MOCK_DELAY = 800; // Simulate network delay
-
-// Simulate network delay
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// Mock API response wrapper
-export const mockApiCall = async <T>(
-  data: T,
-  shouldFail = false,
-  errorMessage = "Something went wrong"
-): Promise<ApiResponse<T>> => {
-  await delay(MOCK_DELAY);
-
-  if (shouldFail) {
-    throw new Error(errorMessage);
-  }
-
-  return {
-    data,
-    success: true,
-    message: "Success",
-  };
-};
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Get JWT token from localStorage
 const getAuthToken = (): string | null => {

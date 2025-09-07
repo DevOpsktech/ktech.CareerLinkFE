@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Building, MapPin, Clock, DollarSign } from "lucide-react";
+import { Building, MapPin, Clock } from "lucide-react";
 import { Button } from "../../ui/Button";
 import {
   formatJobType,
   formatPostedDate,
-  formatSalary,
 } from "../../jobDetail/JobDetailFunctions";
 
 interface JobCardProps {

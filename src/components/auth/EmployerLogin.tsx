@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { Button } from "../ui/Button";
-import { Briefcase, Mail, Lock, AlertCircle, User } from "lucide-react";
+import { Briefcase, Mail, Lock, AlertCircle } from "lucide-react";
 
 export function EmployerLogin() {
   const { login, isLoading, error } = useAuth();

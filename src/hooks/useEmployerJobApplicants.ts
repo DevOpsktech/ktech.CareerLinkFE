@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback } from "react";
 import { employersApi } from "../api/employerApi";
 import type { JobApplication } from "../types/job";
@@ -120,8 +121,7 @@ export const useEmployerJobApplicants = () => {
   const updateApplicationStatus = useCallback(
     async (
       applicationId: string,
-      status: JobApplication["status"],
-      notes?: string
+      status: JobApplication["status"]
     ): Promise<JobApplication | null> => {
       try {
         // TODO: Implement status update API call when available
