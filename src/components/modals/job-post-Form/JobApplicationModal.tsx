@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { X, Upload, FileText, AlertCircle } from "lucide-react";
+import { Upload, FileText, AlertCircle, X } from "lucide-react";
 import { Button } from "../../ui/Button";
+import { Modal } from "../../ui/Modal";
 
 interface JobApplicationModalProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -81,27 +82,14 @@ export function JobApplicationModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">
-              Apply for Position
-            </h2>
-            <p className="text-sm text-gray-600 mt-1">
-              {job.title} at {job.company}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-            disabled={isSubmitting}
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+    <Modal 
+      isOpen={true} 
+      onClose={onClose} 
+      title="Apply for Position" 
+      subtitle={`${job.title} at ${job.company}`}
+      size="2xl"
+    >
+      <form onSubmit={handleSubmit} className="space-y-6 max-h-[65vh] overflow-y-auto">
           {/* Job Summary */}
           <div className="bg-gray-50 p-4 rounded-lg">
             <h3 className="font-medium text-gray-900 mb-2">Position Details</h3>
@@ -268,7 +256,6 @@ Best regards,
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }

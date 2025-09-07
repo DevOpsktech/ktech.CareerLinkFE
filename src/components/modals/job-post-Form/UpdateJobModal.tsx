@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useMemo, useState } from "react";
-import { X } from "lucide-react";
 import BasicInfoSection from "../../forms/job-posting-form/BasicInfoSection";
+import { Modal } from "../../ui/Modal";
 import LocationSection from "../../forms/job-posting-form/LocationSection";
 import SalarySection from "../../forms/job-posting-form/SalarySection";
 import { SkillsSection } from "../../forms/job-posting-form/SkillSection";
@@ -134,25 +134,14 @@ export function UpdateJobModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/10 bg-opacity-10 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">Update Job</h2>
-            <p className="text-sm text-gray-600 mt-1">
-              Edit the job details below
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-            disabled={submitting}
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      title="Update Job" 
+      subtitle="Edit the job details below"
+      size="3xl"
+    >
+      <form onSubmit={handleSubmit} className="space-y-6 max-h-[65vh] overflow-y-auto">
           <BasicInfoSection formData={formData} onChange={handleChange} />
           <LocationSection formData={formData} onChange={handleChange} />
           <SalarySection formData={formData} onChange={handleChange} />
@@ -195,8 +184,7 @@ export function UpdateJobModal({
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }
 

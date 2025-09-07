@@ -1,3 +1,6 @@
+import { Modal } from "./Modal";
+import { Button } from "./Button";
+
 interface ConfirmModalProps {
   isOpen: boolean;
   title?: string;
@@ -17,28 +20,29 @@ export function ConfirmModal({
   onConfirm,
   onCancel,
 }: ConfirmModalProps) {
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center animate-fade-in">
-        <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
-        <p className="text-gray-500 mt-2">{message}</p>
-        <div className="flex justify-center gap-4 mt-6">
-          <button
+    <Modal isOpen={isOpen} onClose={onCancel} title={title} size="sm">
+      <div className="text-center">
+        <p className="text-gray-600 mb-6">{message}</p>
+        <div className="flex justify-center gap-4">
+          <Button
             onClick={onCancel}
-            className="px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium transition-all"
+            variant="outline"
+            size="md"
+            className="rounded-full min-w-24"
           >
             {cancelText}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onConfirm}
-            className="px-4 py-2 rounded-full bg-red-500 hover:bg-red-600 text-white font-medium transition-all"
+            variant="red"
+            size="md"
+            className="rounded-full min-w-24"
           >
             {confirmText}
-          </button>
+          </Button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

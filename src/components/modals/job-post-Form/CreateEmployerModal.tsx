@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { X, Building, Mail, PersonStanding, Phone } from "lucide-react";
+import { Building, Mail, PersonStanding, Phone } from "lucide-react";
 import { Button } from "../../ui/Button";
+import { Modal } from "../../ui/Modal";
 import { InputField } from "./InputField";
 import { SelectField } from "./SelectField";
 import { PasswordField } from "./PasswordField";
@@ -101,21 +102,13 @@ export function CreateEmployerModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/10  bg-opacity-10 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">
-            Create Employer Account
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+    <Modal 
+      isOpen={true} 
+      onClose={onClose} 
+      title="Create Employer Account" 
+      size="md"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4 max-h-[65vh] overflow-y-auto">
           <InputField
             label="Name"
             id="name"
@@ -250,7 +243,6 @@ export function CreateEmployerModal({
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }

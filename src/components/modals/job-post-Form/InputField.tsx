@@ -11,6 +11,8 @@ interface InputFieldProps {
   error?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
+  min?: string;
+  max?: string;
 }
 
 export function InputField({
@@ -24,6 +26,8 @@ export function InputField({
   error,
   onChange,
   required = false,
+  min,
+  max,
 }: InputFieldProps) {
   return (
     <div>
@@ -48,6 +52,8 @@ export function InputField({
             error ? "border-red-300" : "border-gray-300"
           }`}
           required={required}
+          min={min}
+          max={max}
         />
       </div>
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}

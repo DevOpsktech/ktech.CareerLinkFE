@@ -70,7 +70,7 @@ export function Navigation() {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-3">
-              {user?.role === "Admin" &&
+              {/* {user?.role === "Admin" &&
                 roles.map(({ key, path, label, icon: Icon }) => (
                   <NavButton
                     key={key}
@@ -80,7 +80,7 @@ export function Navigation() {
                     color={getRoleColor(key)}
                     onClick={() => handleRoleNavigation(path)}
                   />
-                ))}
+                ))} */}
 
               {/* Profile Link */}
               {/* <button
