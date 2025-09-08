@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { Button } from "../ui/Button";
 import { GraduationCap, AlertCircle, Mail, Lock, User } from "lucide-react";
+import { useState } from "react";
 
 export function StudentLogin() {
   const { login, register, isLoading, error } = useAuth();
