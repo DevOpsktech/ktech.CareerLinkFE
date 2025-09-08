@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback, useRef } from "react";
 import { companyApi } from "../api/companyApi";
-import type { Company, CompanySearchFilters } from "../types/employer";
+import type { Company } from "../types/employer";
+import type { CompanySearchFilters } from "../api/companyApi";
 import { cleanApiResponse } from "../utils/api";
 import { useToast } from "../contexts/ToastContext";
 
@@ -104,17 +105,29 @@ export const useCompanies = (filters: CompanySearchFilters = {}) => {
 
       try {
         const response = await companyApi.updateCompany(id, companyData);
-        const updatedCompany = response.data as Company;
-
-        // Optimistically update the companies list
-        setCompanies((prevCompanies) =>
-          prevCompanies.map((company) =>
-            company.id === id ? updatedCompany : company
-          )
-        );
+        // Some backends may return only partial data or a boolean; merge with existing
+        setCompanies((prevCompanies) => {
+          return prevCompanies.map((company) => {
+            if (company.id !== id) return company;
+            const apiData = (
+              response && typeof response === "object"
+                ? (response as any).data
+                : null
+            ) as Partial<Company> | null;
+            const merged: Company = {
+              ...company,
+              ...(apiData || {}),
+              ...companyData,
+              id: company.id,
+            } as Company;
+            return merged;
+          });
+        });
 
         showSuccess("Company updated successfully!");
-        return updatedCompany;
+        // Try to return the merged object for the updated id
+        const next = (response?.data as Company) || null;
+        return next;
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to update company";

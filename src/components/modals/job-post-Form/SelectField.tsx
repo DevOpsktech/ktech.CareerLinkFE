@@ -1,4 +1,5 @@
 import React from "react";
+import Astick from "../../ui/Astick";
 
 interface SelectFieldProps {
   id: string;
@@ -11,6 +12,7 @@ interface SelectFieldProps {
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   disabled?: boolean;
   required?: boolean;
+  asterisk?: boolean;
 }
 
 export function SelectField({
@@ -24,6 +26,7 @@ export function SelectField({
   onChange,
   disabled = false,
   required = false,
+  asterisk = false,
 }: SelectFieldProps) {
   return (
     <div>
@@ -32,6 +35,7 @@ export function SelectField({
         className="block text-sm font-medium text-gray-700 mb-2"
       >
         {label}
+        {asterisk && <Astick />}
       </label>
       <div className="relative">
         <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">

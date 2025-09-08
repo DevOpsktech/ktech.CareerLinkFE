@@ -4,6 +4,7 @@ import { DataTable } from "../ui/DataTable";
 import { Button } from "../ui/Button";
 import { CreateEmployerModal } from "../modals/job-post-Form/CreateEmployerModal";
 import { CreateCompanyModal } from "../modals/CreateCompanyModal";
+import { UpdateEmployerModal } from "../modals/job-post-Form/UpdateEmployerModal";
 import {
   Plus,
   Search,
@@ -17,6 +18,8 @@ import type { Employer } from "../../types/employer";
 import { useAuth } from "../../contexts/AuthContext";
 import { companyApi } from "../../api/companyApi";
 import type { CreateCompanyRequest } from "../../api/companyApi";
+import { ConfirmModal } from "../ui/ConfirmModal";
+import { useToast } from "../../contexts/ToastContext";
 
 interface EmployerFormData {
   name: string;
@@ -29,21 +32,33 @@ interface EmployerFormData {
 }
 
 export function EmployerManagement() {
-  const { employers, loading, deleteEmployer } = useEmployers();
+  const { employers, loading, deleteEmployer, updateEmployer } = useEmployers();
   const { register, error } = useAuth();
+  const { showSuccess, showError } = useToast();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateEmployerModalOpen, setIsCreateEmployerModalOpen] =
     useState(false);
   const [isCreateCompanyModalOpen, setIsCreateCompanyModalOpen] =
     useState(false);
-
-  const filteredEmployers = employers.filter(
-    (employer) =>
-      employer.company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employer.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const [isUpdateEmployerModalOpen, setIsUpdateEmployerModalOpen] =
+    useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [selectedEmployer, setSelectedEmployer] = useState<Employer | null>(
+    null
   );
+
+  const search = searchTerm.toLowerCase();
+  const filteredEmployers = employers.filter((employer) => {
+    const companyName = employer.company?.name ?? "";
+    const email = employer.email ?? "";
+    const fullName = employer.fullName ?? "";
+    return (
+      companyName.toLowerCase().includes(search) ||
+      email.toLowerCase().includes(search) ||
+      fullName.toLowerCase().includes(search)
+    );
+  });
 
   const columns = [
     {
@@ -56,10 +71,10 @@ export function EmployerManagement() {
           </div>
           <div>
             <div className="font-medium text-gray-900">
-              {employer.company.name}
+              {employer.company?.name ?? "N/A"}
             </div>
             <div className="text-sm text-gray-500">
-              {employer.company.industry}
+              {employer.company?.industry ?? "N/A"}
             </div>
           </div>
         </div>
@@ -92,12 +107,12 @@ export function EmployerManagement() {
               {employer.phone}
             </div>
           )}
-          {(employer.company.city || employer.company.state) && (
+          {(employer.company?.city || employer.company?.state) && (
             <div className="flex items-center text-sm text-gray-600">
               <MapPin className="w-4 h-4 mr-2" />
-              {employer.company.city}
-              {employer.company.city && employer.company.state ? ", " : ""}
-              {employer.company.state}
+              {employer.company?.city}
+              {employer.company?.city && employer.company?.state ? ", " : ""}
+              {employer.company?.state}
             </div>
           )}
         </div>
@@ -112,8 +127,8 @@ export function EmployerManagement() {
             variant="outline"
             size="sm"
             onClick={() => {
-              // Handle edit employer
-              console.log("Edit employer:", employer.id);
+              setSelectedEmployer(employer);
+              setIsUpdateEmployerModalOpen(true);
             }}
           >
             Edit
@@ -122,9 +137,8 @@ export function EmployerManagement() {
             variant="outline"
             size="sm"
             onClick={() => {
-              if (confirm("Are you sure you want to delete this employer?")) {
-                deleteEmployer(employer.id);
-              }
+              setSelectedEmployer(employer);
+              setIsConfirmOpen(true);
             }}
             className="text-red-600 hover:text-red-700 hover:border-red-300"
           >
@@ -135,16 +149,24 @@ export function EmployerManagement() {
     },
   ];
 
+  const handleConfirmDelete = () => {
+    if (selectedEmployer) {
+      deleteEmployer(selectedEmployer.id);
+    }
+    setIsConfirmOpen(false);
+    setSelectedEmployer(null);
+  };
+
   const handleCreateCompany = async (companyData: CreateCompanyRequest) => {
     try {
       const response = await companyApi.createCompany(companyData);
       if (response.success) {
-        console.log("Company created successfully:", response.data);
+        showSuccess("Company created successfully!");
         setIsCreateCompanyModalOpen(false);
-        // Optionally refresh companies list or show success message
       }
     } catch (error) {
       console.error("Failed to create company:", error);
+      showError("Failed to create company!");
     }
   };
 
@@ -162,22 +184,37 @@ export function EmployerManagement() {
       });
 
       if (registerResponse) {
-        // Then create the employer profile with additional data
-        // This would typically be done after successful registration
-        // For now, we'll just log the employer data that would be sent
-        console.log("Employer profile data:", {
-          userId: "1003", // Would come from registration response
-          companyId: employerData.companyId,
-          name: employerData.name,
-          email: employerData.email,
-          position: employerData.position,
-          phone: employerData.phone,
-        });
-
+        showSuccess("Employer created successfully!");
         setIsCreateEmployerModalOpen(false);
       }
     } catch (error) {
       console.error("Failed to create employer:", error);
+      showError("Failed to create employer!");
+    }
+  };
+
+  const handleUpdateEmployer = async (
+    data: Partial<{
+      fullName: string;
+      position: string;
+      companyId: string;
+      email: string;
+      phone: string;
+    }>
+  ) => {
+    if (!selectedEmployer) return;
+    try {
+      await updateEmployer(selectedEmployer.id, {
+        fullName: data.fullName,
+        position: data.position,
+        phone: data.phone,
+        email: data.email,
+        company: data.companyId,
+      });
+      setIsUpdateEmployerModalOpen(false);
+      setSelectedEmployer(null);
+    } catch {
+      // error toasts handled in hook
     }
   };
 
@@ -199,7 +236,7 @@ export function EmployerManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">
             Employer Management
@@ -208,17 +245,17 @@ export function EmployerManagement() {
             Manage employer accounts and company information
           </p>
         </div>
-        <div className="flex space-x-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
           <Button
             variant="outline"
-            className="flex items-center justify-center"
+            className="flex items-center justify-center w-full sm:w-auto"
             onClick={() => setIsCreateCompanyModalOpen(true)}
           >
             <Building className="w-4 h-4 mr-2" />
             Add Company
           </Button>
           <Button
-            className="flex items-center justify-center"
+            className="flex items-center justify-center w-full sm:w-auto"
             onClick={() => setIsCreateEmployerModalOpen(true)}
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -257,6 +294,33 @@ export function EmployerManagement() {
           onSubmit={handleCreateEmployer}
         />
       )}
+
+      {isUpdateEmployerModalOpen && (
+        <UpdateEmployerModal
+          isOpen={isUpdateEmployerModalOpen}
+          employer={selectedEmployer}
+          onClose={() => {
+            setIsUpdateEmployerModalOpen(false);
+            setSelectedEmployer(null);
+          }}
+          onSubmit={handleUpdateEmployer}
+        />
+      )}
+
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        title="Delete Employer"
+        message={`Are you sure you want to delete ${
+          selectedEmployer?.email || "this employer"
+        }?`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          setIsConfirmOpen(false);
+          setSelectedEmployer(null);
+        }}
+      />
     </div>
   );
 }

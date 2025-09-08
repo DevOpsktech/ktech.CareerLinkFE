@@ -102,84 +102,87 @@ export function CreateEmployerModal({
   };
 
   return (
-    <Modal 
-      isOpen={true} 
-      onClose={onClose} 
-      title="Create Employer Account" 
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title="Create Employer Account"
       size="md"
     >
-      <form onSubmit={handleSubmit} className="space-y-4 max-h-[65vh] overflow-y-auto">
-          <InputField
-            label="Name"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Enter employer name"
-            icon={<PersonStanding size={18} />}
-            error={errors.name}
-          />
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 max-h-[65vh] overflow-y-auto"
+      >
+        <InputField
+          label="Name"
+          id="name"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Enter employer name"
+          icon={<PersonStanding size={18} />}
+          error={errors.name}
+        />
 
-          <InputField
-            label="Position"
-            id="position"
-            name="position"
-            value={formData.position}
-            onChange={handleChange}
-            placeholder="Enter employer position"
-            icon={<Building size={18} />}
-            error={errors.position}
-          />
+        <InputField
+          label="Position"
+          id="position"
+          name="position"
+          value={formData.position}
+          onChange={handleChange}
+          placeholder="Enter employer position"
+          icon={<Building size={18} />}
+          error={errors.position}
+        />
 
-          <SelectField
-            id="companyId"
-            name="companyId"
-            label="Company"
-            value={formData.companyId}
-            onChange={handleChange}
-            options={[
-              {
-                value: "",
-                label: loadingCompanies
-                  ? "Loading companies..."
-                  : "Select company",
-              },
-              ...(Array.isArray(companies)
-                ? companies.map((company) => ({
-                    value: company.id,
-                    label: `${company.name} (${company.industry})`,
-                  }))
-                : []),
-            ]}
-            icon={<Building size={18} />}
-            error={errors.companyId}
-            disabled={loadingCompanies}
-          />
+        <SelectField
+          id="companyId"
+          name="companyId"
+          label="Company"
+          value={formData.companyId}
+          onChange={handleChange}
+          options={[
+            {
+              value: "",
+              label: loadingCompanies
+                ? "Loading companies..."
+                : "Select company",
+            },
+            ...(Array.isArray(companies)
+              ? companies.map((company) => ({
+                  value: company.id,
+                  label: `${company.name} (${company.industry})`,
+                }))
+              : []),
+          ]}
+          icon={<Building size={18} />}
+          error={errors.companyId}
+          disabled={loadingCompanies}
+        />
 
-          <InputField
-            label="Email"
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="hr@company.com"
-            icon={<Mail size={18} />}
-            error={errors.email}
-          />
+        <InputField
+          label="Email"
+          id="email"
+          name="email"
+          type="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="hr@company.com"
+          icon={<Mail size={18} />}
+          error={errors.email}
+        />
 
-          <InputField
-            label="Phone"
-            id="phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="+91-9876543210"
-            icon={<Phone size={18} />}
-            error={errors.phone}
-          />
+        <InputField
+          label="Phone"
+          id="phone"
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+          placeholder="+91-9876543210"
+          icon={<Phone size={18} />}
+          error={errors.phone}
+        />
 
-          {/* <PasswordField
+        {/* <PasswordField
             value={formData.password}
             showPassword={showPassword}
             onToggleShowPassword={() => setShowPassword((prev) => !prev)}
@@ -188,17 +191,17 @@ export function CreateEmployerModal({
             onChange={handleChange}
             error={errors.password}
           /> */}
-          <PasswordField
-            label="password"
-            name="password"
-            onChange={handleChange}
-            onToggleShowPassword={() => setShowPassword((prev) => !prev)}
-            showPassword={showPassword}
-            id="password"
-            generatePassword={generatePassword}
-            value={formData.password}
-          />
-          {/* <PasswordField
+        <PasswordField
+          label="password"
+          name="password"
+          onChange={handleChange}
+          onToggleShowPassword={() => setShowPassword((prev) => !prev)}
+          showPassword={showPassword}
+          id="password"
+          generatePassword={generatePassword}
+          value={formData.password}
+        />
+        {/* <PasswordField
             label="confirm password"
             name="confirm-password"
             onChange={handleChange}
@@ -207,42 +210,31 @@ export function CreateEmployerModal({
             value={formData.confirmPassword}
           /> */}
 
-          <PasswordField
-            label="Confirm Password"
-            name="confirmPassword"
-            onChange={handleChange}
-            showPassword={showPassword}
-            id="confirmPassword"
-            value={formData.confirmPassword}
-            onToggleShowPassword={() => setShowPassword((prev) => !prev)}
-            error={errors.confirmPassword}
-          />
+        <PasswordField
+          label="Confirm Password"
+          name="confirmPassword"
+          onChange={handleChange}
+          showPassword={showPassword}
+          id="confirmPassword"
+          value={formData.confirmPassword}
+          onToggleShowPassword={() => setShowPassword((prev) => !prev)}
+          error={errors.confirmPassword}
+        />
 
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h4 className="text-sm font-medium text-blue-800 mb-2">
-              Account Setup
-            </h4>
-            <ul className="text-xs text-blue-700 space-y-1">
-              <li>• Employer will receive login credentials via email</li>
-              <li>• They can change their password after first login</li>
-              <li>• Account will be active immediately after creation</li>
-            </ul>
-          </div>
-
-          <div className="flex space-x-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary" className="flex-1">
-              Create Account
-            </Button>
-          </div>
-        </form>
+        <div className="flex space-x-3 pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <Button type="submit" variant="primary" className="flex-1">
+            Create Account
+          </Button>
+        </div>
+      </form>
     </Modal>
   );
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import Astick from "../../ui/Astick";
 
 interface InputFieldProps {
   id: string;
@@ -13,6 +14,7 @@ interface InputFieldProps {
   required?: boolean;
   min?: string;
   max?: string;
+  asterisk?: boolean;
 }
 
 export function InputField({
@@ -28,6 +30,7 @@ export function InputField({
   required = false,
   min,
   max,
+  asterisk = false,
 }: InputFieldProps) {
   return (
     <div>
@@ -36,6 +39,7 @@ export function InputField({
         className="block text-sm font-medium text-gray-700 mb-2"
       >
         {label}
+        {asterisk && <Astick />}
       </label>
       <div className="relative">
         <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">

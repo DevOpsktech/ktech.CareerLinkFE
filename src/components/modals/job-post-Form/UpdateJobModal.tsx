@@ -3,7 +3,7 @@ import React, { useMemo, useState } from "react";
 import BasicInfoSection from "../../forms/job-posting-form/BasicInfoSection";
 import { Modal } from "../../ui/Modal";
 import LocationSection from "../../forms/job-posting-form/LocationSection";
-import SalarySection from "../../forms/job-posting-form/SalarySection";
+// import SalarySection from "../../forms/job-posting-form/SalarySection";
 import { SkillsSection } from "../../forms/job-posting-form/SkillSection";
 import { DescriptionSection } from "../../forms/job-posting-form/DescriptionSection";
 import { ResponsibilitiesSection } from "../../forms/job-posting-form/ResponsibilitiesSection";
@@ -134,56 +134,59 @@ export function UpdateJobModal({
   };
 
   return (
-    <Modal 
-      isOpen={isOpen} 
-      onClose={onClose} 
-      title="Update Job" 
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Update Job"
       subtitle="Edit the job details below"
       size="3xl"
     >
-      <form onSubmit={handleSubmit} className="space-y-6 max-h-[65vh] overflow-y-auto">
-          <BasicInfoSection formData={formData} onChange={handleChange} />
-          <LocationSection formData={formData} onChange={handleChange} />
-          <SalarySection formData={formData} onChange={handleChange} />
-          <SkillsSection
-            formData={formData}
-            onChange={
-              handleChange as unknown as React.ChangeEventHandler<HTMLInputElement>
-            }
-          />
-          <DescriptionSection
-            formData={formData}
-            onChange={
-              handleChange as unknown as React.ChangeEventHandler<HTMLTextAreaElement>
-            }
-          />
-          <ResponsibilitiesSection
-            formData={formData}
-            onChange={
-              handleChange as unknown as React.ChangeEventHandler<HTMLTextAreaElement>
-            }
-          />
-          <RequirementsSection
-            formData={formData}
-            onChange={
-              handleChange as unknown as React.ChangeEventHandler<HTMLTextAreaElement>
-            }
-          />
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6 max-h-[65vh] overflow-y-auto"
+      >
+        <BasicInfoSection formData={formData} onChange={handleChange} />
+        <LocationSection formData={formData} onChange={handleChange} />
+        {/* <SalarySection formData={formData} onChange={handleChange} /> */}
+        <SkillsSection
+          formData={formData}
+          onChange={
+            handleChange as unknown as React.ChangeEventHandler<HTMLInputElement>
+          }
+        />
+        <DescriptionSection
+          formData={formData}
+          onChange={
+            handleChange as unknown as React.ChangeEventHandler<HTMLTextAreaElement>
+          }
+        />
+        <ResponsibilitiesSection
+          formData={formData}
+          onChange={
+            handleChange as unknown as React.ChangeEventHandler<HTMLTextAreaElement>
+          }
+        />
+        <RequirementsSection
+          formData={formData}
+          onChange={
+            handleChange as unknown as React.ChangeEventHandler<HTMLTextAreaElement>
+          }
+        />
 
-          <div className="flex space-x-3 pt-2 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={submitting}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary" disabled={submitting}>
-              {submitting ? "Updating..." : "Update Job"}
-            </Button>
-          </div>
-        </form>
+        <div className="flex space-x-3 pt-2 justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={submitting}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" variant="primary" disabled={submitting}>
+            {submitting ? "Updating..." : "Update Job"}
+          </Button>
+        </div>
+      </form>
     </Modal>
   );
 }

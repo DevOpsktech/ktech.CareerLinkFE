@@ -2,7 +2,7 @@ export interface Employer {
   id: string;
   userId: string;
   companyId: string;
-  name: string;
+  fullName: string;
   email: string;
   position?: string;
   phone?: string;
@@ -36,7 +36,7 @@ export interface CreateEmployerRequest {
   email: string;
   password: string;
   industry: string;
-  name?: string;
+  fullName?: string;
   position?: string;
   phone?: string;
   website?: string;

@@ -122,11 +122,20 @@ export const useEmployers = (filters: EmployerSearchFilters = {}) => {
         const responseData = response.data || response;
         const updatedEmployer = responseData as Employer;
 
-        // Optimistically update the employers list
+        // Optimistically update the employers list, preserving nested objects if missing from response
         setEmployers((prevEmployers) =>
-          prevEmployers.map((employer) =>
-            employer.id === id ? updatedEmployer : employer
-          )
+          prevEmployers.map((employer) => {
+            if (employer.id !== id) return employer;
+            return {
+              ...employer,
+              ...updatedEmployer,
+              company:
+                updatedEmployer &&
+                (updatedEmployer as Partial<Employer>).company
+                  ? (updatedEmployer as Employer).company
+                  : employer.company,
+            } as Employer;
+          })
         );
 
         showSuccess("Employer updated successfully!");

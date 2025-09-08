@@ -4,6 +4,7 @@ import {
   type Skill,
   type CreateSkillRequest,
 } from "../../../hooks/useSkills";
+import { useAuth } from "../../../contexts/AuthContext";
 
 interface SkillsSectionProps {
   formData: {
@@ -14,6 +15,8 @@ interface SkillsSectionProps {
 
 export function SkillsSection({ formData, onChange }: SkillsSectionProps) {
   const { skills = [], loading, createSkill } = useSkills(); // Default to empty array
+  const { user } = useAuth();
+  const isAdmin = user?.role === "Admin";
   const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -98,6 +101,7 @@ export function SkillsSection({ formData, onChange }: SkillsSectionProps) {
   };
 
   const handleCreateSkill = async () => {
+    if (!isAdmin) return; // Only Admin can create skills
     if (!newSkillName.trim() || !newSkillCategory.trim()) return;
 
     const skillData: CreateSkillRequest = {
@@ -119,7 +123,7 @@ export function SkillsSection({ formData, onChange }: SkillsSectionProps) {
       e.preventDefault();
       if (filteredSkills.length > 0) {
         handleSkillSelect(filteredSkills[0]);
-      } else if (searchTerm && !exactMatch) {
+      } else if (searchTerm && !exactMatch && isAdmin) {
         setIsCreatingSkill(true);
         setNewSkillName(searchTerm);
       }
@@ -214,7 +218,7 @@ export function SkillsSection({ formData, onChange }: SkillsSectionProps) {
                 )}
 
                 {/* Create New Skill Option */}
-                {searchTerm && !exactMatch && !isCreatingSkill && (
+                {isAdmin && searchTerm && !exactMatch && !isCreatingSkill && (
                   <button
                     type="button"
                     onClick={() => {
@@ -228,7 +232,7 @@ export function SkillsSection({ formData, onChange }: SkillsSectionProps) {
                 )}
 
                 {/* Create Skill Form */}
-                {isCreatingSkill && (
+                {isAdmin && isCreatingSkill && (
                   <div className="p-4 border-t border-gray-200 bg-gray-50">
                     <div className="space-y-3">
                       <div>
@@ -302,7 +306,9 @@ export function SkillsSection({ formData, onChange }: SkillsSectionProps) {
       </div>
 
       <p className="mt-1 text-sm text-gray-500">
-        Search and select skills, or create new ones if they don't exist
+        {isAdmin
+          ? "Search and select skills, or create new ones if they don't exist"
+          : "Search and select skills from the existing list. Only admins can add new skills."}
       </p>
     </div>
   );

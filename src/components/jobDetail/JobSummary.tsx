@@ -14,14 +14,6 @@ export default function JobSummary({
             {formatJobType(job.type)}
           </dd>
         </div>
-        <div>
-          <dt className="text-sm font-medium text-gray-500">
-            Experience Level
-          </dt>
-          <dd className="text-sm text-gray-900 mt-1 capitalize">
-            {String(job.experienceLevel).toLowerCase()}
-          </dd>
-        </div>
         {job.location && (
           <div>
             <dt className="text-sm font-medium text-gray-500">Location</dt>
@@ -35,12 +27,6 @@ export default function JobSummary({
             </dd>
           </div>
         )}
-        {/* {(job.salary || job.salaryMin != null || job.salaryMax != null) && (
-          <div>
-            <dt className="text-sm font-medium text-gray-500">Salary</dt>
-            <dd className="text-sm text-gray-900 mt-1">{formatSalary(job)}</dd>
-          </div>
-        )} */}
         <div>
           <dt className="text-sm font-medium text-gray-500">Posted</dt>
           <dd className="text-sm text-gray-900 mt-1">

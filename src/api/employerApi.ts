@@ -52,12 +52,12 @@ export const employersApi = {
     id: string,
     employerData: Partial<CreateEmployerRequest>
   ): Promise<ApiResponse<Employer>> => {
-    return apiClient.put<Employer>(`/employer/profile/${id}`, employerData);
+    return apiClient.put<Employer>(`/Admin/employers/${id}`, employerData);
   },
 
   // Delete employer
   deleteEmployer: async (id: string): Promise<ApiResponse<boolean>> => {
-    return apiClient.delete<boolean>(`/employers/${id}`);
+    return apiClient.delete<boolean>(`/Admin/employers/${id}`);
   },
 
   // Toggle employer status

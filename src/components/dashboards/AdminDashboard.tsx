@@ -12,6 +12,7 @@ import { useState } from "react";
 import { ConfirmModal } from "../ui/ConfirmModal";
 import { jobsApi } from "../../api/jobsApi";
 import { useToast } from "../../contexts/ToastContext";
+import SkillsManagement from "../features/SkillsManagement";
 
 export function AdminDashboard() {
   const { jobs, refetch } = useJobs();
@@ -104,6 +105,7 @@ export function AdminDashboard() {
       {/* Management Tables */}
       <div className="space-y-8">
         <EmployerManagement />
+        <SkillsManagement />
         <div className="bg-white rounded-xl shadow-sm">
           <div className="p-6 border-b border-gray-100">
             <h2 className="text-xl font-semibold text-gray-900">

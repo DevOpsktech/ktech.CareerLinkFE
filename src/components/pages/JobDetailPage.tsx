@@ -10,7 +10,6 @@ import {
   formatDeadline,
   formatJobType,
   formatPostedDate,
-  formatSalary,
 } from "../jobDetail/JobDetailFunctions";
 import {
   JobHeader,
@@ -106,7 +105,6 @@ export default function JobDetailPage() {
               formatDeadline={formatDeadline}
               formatJobType={formatJobType}
               formatPostedDate={formatPostedDate}
-              formatSalary={formatSalary}
               job={job}
             />
 
@@ -154,15 +152,11 @@ export default function JobDetailPage() {
               formatDeadline={formatDeadline}
               formatJobType={formatJobType}
               formatPostedDate={formatPostedDate}
-              formatSalary={formatSalary}
               job={job}
             />
 
             {/* Company Info */}
             <CompanyInfo job={job} />
-
-            {/* Share Job */}
-            {/* <ShareJob job={job} /> */}
           </div>
         </div>
       </div>
