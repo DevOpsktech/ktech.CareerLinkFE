@@ -1,10 +1,15 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { ToastProvider } from "./contexts/ToastContext";
 import { LoginPage } from "./components/auth/LoginPage";
+import { RegisterPage } from "./components/auth/RegisterPage";
+import { ProfilePage } from "./components/auth/ProfilePage";
 import { Navigation } from "./components/Navigation";
 import { AdminDashboard } from "./components/dashboards/AdminDashboard";
 import { EmployerDashboard } from "./components/dashboards/EmployerDashboard";
 import { StudentDashboard } from "./components/dashboards/StudentDashboard";
+import JobDetailPage from "./components/pages/JobDetailPage";
+
 function AppContent() {
   const { user } = useAuth();
 
@@ -12,6 +17,7 @@ function AppContent() {
     return (
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     );
@@ -22,8 +28,11 @@ function AppContent() {
       <Navigation />
       <main className="pt-16">
         <Routes>
+          {/* Profile Route - Available to all authenticated users */}
+          <Route path="/profile" element={<ProfilePage />} />
+
           {/* Admin Routes */}
-          {user.role === "admin" && (
+          {user.role === "Admin" && (
             <>
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/employer" element={<EmployerDashboard />} />
@@ -32,14 +41,19 @@ function AppContent() {
           )}
 
           {/* Employer Routes */}
-          {(user.role === "employer" || user.role === "admin") && (
+          {(user.role === "Employer" || user.role === "Admin") && (
             <Route path="/employer" element={<EmployerDashboard />} />
           )}
 
           {/* Student Routes */}
-          {(user.role === "student" || user.role === "admin") && (
-            <Route path="/student" element={<StudentDashboard />} />
+          {(user.role === "Student" || user.role === "Admin") && (
+            <>
+              <Route path="/student" element={<StudentDashboard />} />
+              <Route path="/jobs/:id" element={<JobDetailPage />} />
+            </>
           )}
+
+          <Route path="/jobs/:id" element={<JobDetailPage />} />
 
           {/* Default redirects based on user role */}
           <Route
@@ -47,9 +61,9 @@ function AppContent() {
             element={
               <Navigate
                 to={
-                  user.role === "admin"
+                  user.role === "Admin"
                     ? "/admin"
-                    : user.role === "employer"
+                    : user.role === "Employer"
                     ? "/employer"
                     : "/student"
                 }
@@ -64,9 +78,9 @@ function AppContent() {
             element={
               <Navigate
                 to={
-                  user.role === "admin"
+                  user.role === "Admin"
                     ? "/admin"
-                    : user.role === "employer"
+                    : user.role === "Employer"
                     ? "/employer"
                     : "/student"
                 }
@@ -82,9 +96,11 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ToastProvider>
   );
 }
 

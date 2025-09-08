@@ -1,6 +1,7 @@
 import React from "react";
 
 interface EducationSectionProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   formData: any;
   onChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -17,17 +18,17 @@ export function EducationSection({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
           <label
-            htmlFor="education"
+            htmlFor="university"
             className="block text-sm font-medium text-gray-700 mb-2"
           >
-            Institution *
+            University *
           </label>
           <input
             type="text"
-            id="education"
-            name="education"
+            id="university"
+            name="university"
             required
-            value={formData.education}
+            value={formData.university}
             onChange={onChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-colors"
             placeholder="University of Technology"
@@ -41,16 +42,22 @@ export function EducationSection({
           >
             Major/Field of Study *
           </label>
-          <input
-            type="text"
+          <select
             id="major"
             name="major"
             required
             value={formData.major}
             onChange={onChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-colors"
-            placeholder="Computer Science"
-          />
+          >
+            <option value="">All Majors</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Business Administration">
+              Business Administration
+            </option>
+            <option value="Engineering">Engineering</option>
+            <option value="Design">Design</option>
+          </select>
         </div>
 
         <div>

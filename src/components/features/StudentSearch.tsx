@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Search, Filter, Download, X } from "lucide-react";
+import { Search, Star, Eye } from "lucide-react";
 import { Button } from "../ui/Button";
-import { studentColumns, studentData } from "../../constants";
-import { StudentTable } from "../ui/StudentTable";
+import { useStudents } from "../../hooks/useStudents";
+import type { StudentSearchFilters } from "../../types/student";
+import Loader from "../ui/Loader";
+import { employersApi } from "../../api/employerApi";
+import { useToast } from "../../contexts/ToastContext";
 
 export function StudentSearch() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -11,26 +14,76 @@ export function StudentSearch() {
     graduationYear: "",
     skills: "",
   });
-  const [cvModalOpen, setCvModalOpen] = useState(false);
-  const [selectedCv, setSelectedCv] = useState<string | null>(null);
+  const [viewingCvIds, setViewingCvIds] = useState<Set<string>>(new Set());
+
+  const { students, loading, error, fetchStudents } = useStudents();
+  const { showError } = useToast();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Searching for:", searchQuery, filters);
+
+    const searchFilters: StudentSearchFilters = {
+      query: searchQuery || undefined,
+      major: filters.major || undefined,
+      graduationYear: filters.graduationYear
+        ? parseInt(filters.graduationYear)
+        : undefined,
+      skills: filters.skills
+        ? filters.skills.split(",").map((s) => s.trim())
+        : undefined,
+      page: 1,
+    };
+
+    fetchStudents(searchFilters);
   };
 
-  const openCvModal = (cvUrl: string) => {
-    setSelectedCv(cvUrl);
-    setCvModalOpen(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleViewCV = async (student: any) => {
+    if (!student.cvUrl) {
+      showError("CV not available for this student");
+      return;
+    }
+
+    setViewingCvIds((prev) => new Set([...prev, student.id]));
+
+    try {
+      // Record the CV view
+      await employersApi.recordCvView(student.id);
+
+      // Open the CV
+      window.open(student.cvUrl, "_blank");
+    } catch (error) {
+      console.error("Failed to record CV view:", error);
+      window.open(student.cvUrl, "_blank");
+    } finally {
+      setViewingCvIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(student.id);
+        return newSet;
+      });
+    }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleShortlist = (student: any) => {
-    console.log("Shortlisted student:", student);
+    // This would typically call an API to add to shortlist
+    alert(`${student.fullName} has been added to your shortlist!`);
   };
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-600 mb-4">Error loading students: {error}</p>
+        <Button onClick={() => fetchStudents()} variant="primary">
+          Try Again
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Search + Filters */}
+      {/* Search and Filters */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">
           Find Students
@@ -97,30 +150,15 @@ export function StudentSearch() {
                 <option value="2027">2027</option>
               </select>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Skills
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. JavaScript, Marketing"
-                value={filters.skills}
-                onChange={(e) =>
-                  setFilters({ ...filters, skills: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
           </div>
         </form>
       </div>
 
       {/* Search Results */}
       <div className="bg-white rounded-xl shadow-sm">
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+        {/* <div className="p-6 border-b border-gray-100 flex justify-between items-center">
           <h3 className="text-lg font-semibold text-gray-900">
-            Search Results
+            Search Results ({pagination.total} students found)
           </h3>
           <div className="flex items-center space-x-2">
             <Button variant="outline" size="sm">
@@ -132,38 +170,149 @@ export function StudentSearch() {
               Export
             </Button>
           </div>
-        </div>
+        </div> */}
 
-        <StudentTable
-          columns={studentColumns}
-          data={studentData}
-          onViewCv={openCvModal}
-          onShortlist={handleShortlist}
-          actions={true}
-        />
-      </div>
+        {loading ? (
+          <div className="text-center py-8">
+            <Loader text="Loading students..." />
+          </div>
+        ) : students.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-600">
+              No students found matching your criteria.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Major
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Graduation
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Key Skills
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    GPA
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {students.map((student) => (
+                  <tr key={student.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {student.fullName}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {student.major || "Not specified"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {student.graduationYear}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {/* <div className="flex flex-wrap gap-1">
+                        {student.skills.slice(0, 3).map((skill) => (
+                          <span
+                            key={skill.id}
+                            className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"
+                          >
+                            {skill.skillName}
+                          </span>
+                        ))}
+                        {student.skills.length > 3 && (
+                          <span className="text-xs text-gray-500">
+                            +{student.skills.length - 3} more
+                          </span>
+                        )}
+                      </div> */}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {student.gpa ? student.gpa.toFixed(1) : "N/A"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewCV(student)}
+                        disabled={viewingCvIds.has(student.id)}
+                      >
+                        {viewingCvIds.has(student.id) ? (
+                          <>
+                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current mr-1"></div>
+                            Loading...
+                          </>
+                        ) : (
+                          <>
+                            <Eye size={14} className="mr-1" />
+                            View CV
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleShortlist(student)}
+                      >
+                        <Star size={14} className="mr-1" />
+                        Shortlist
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-      {/* CV Modal */}
-      {cvModalOpen && selectedCv && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full relative">
-            <button
-              onClick={() => setCvModalOpen(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
-            >
-              <X size={20} />
-            </button>
-            <div className="p-4">
-              <h2 className="text-lg font-semibold mb-4">Student CV</h2>
-              <iframe
-                src={selectedCv}
-                className="w-full h-[70vh] border rounded"
-                title="Student CV"
-              />
+        {/* Pagination */}
+        {/* {pagination.totalPages > 1 && (
+          <div className="px-6 py-4 border-t border-gray-100">
+            <div className="flex justify-center items-center space-x-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  fetchStudents({
+                    ...filters,
+                    query: searchQuery,
+                    page: pagination.page - 1,
+                  })
+                }
+                disabled={pagination.page <= 1 || loading}
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-gray-600">
+                Page {pagination.page} of {pagination.totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  fetchStudents({
+                    ...filters,
+                    query: searchQuery,
+                    page: pagination.page + 1,
+                  })
+                }
+                disabled={pagination.page >= pagination.totalPages || loading}
+              >
+                Next
+              </Button>
             </div>
           </div>
-        </div>
-      )}
+        )} */}
+      </div>
     </div>
   );
 }

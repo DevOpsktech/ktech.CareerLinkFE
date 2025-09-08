@@ -1,184 +1,326 @@
 import { useState } from "react";
+import { useEmployers } from "../../hooks/useEmployers";
+import { DataTable } from "../ui/DataTable";
 import { Button } from "../ui/Button";
-import { Plus, Search } from "lucide-react";
-import { CreateEmployerModal } from "../modals/job-post-Form/CreateEmployeeModal";
+import { CreateEmployerModal } from "../modals/job-post-Form/CreateEmployerModal";
+import { CreateCompanyModal } from "../modals/CreateCompanyModal";
+import { UpdateEmployerModal } from "../modals/job-post-Form/UpdateEmployerModal";
+import {
+  Plus,
+  Search,
+  Building2,
+  Mail,
+  Phone,
+  MapPin,
+  Building,
+} from "lucide-react";
+import type { Employer } from "../../types/employer";
+import { useAuth } from "../../contexts/AuthContext";
+import { companyApi } from "../../api/companyApi";
+import type { CreateCompanyRequest } from "../../api/companyApi";
+import { ConfirmModal } from "../ui/ConfirmModal";
+import { useToast } from "../../contexts/ToastContext";
 
-interface Employer {
-  id: string;
-  company: string;
+interface EmployerFormData {
+  name: string;
+  position: string;
+  companyId: string;
   email: string;
-  industry: string;
-  jobs: number;
-  status: "Active" | "Inactive";
-  createdAt: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
 }
 
 export function EmployerManagement() {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [employers, setEmployers] = useState<Employer[]>([
-    {
-      id: "1",
-      company: "TechCorp",
-      email: "hr@techcorp.com",
-      industry: "Technology",
-      jobs: 15,
-      status: "Active",
-      createdAt: "2024-01-15",
-    },
-    {
-      id: "2",
-      company: "FinanceInc",
-      email: "careers@financeinc.com",
-      industry: "Finance",
-      jobs: 8,
-      status: "Active",
-      createdAt: "2024-01-12",
-    },
-    {
-      id: "3",
-      company: "HealthCare Ltd",
-      email: "jobs@healthcare.com",
-      industry: "Healthcare",
-      jobs: 12,
-      status: "Inactive",
-      createdAt: "2024-01-08",
-    },
-  ]);
+  const { employers, loading, deleteEmployer, updateEmployer } = useEmployers();
+  const { register, error } = useAuth();
+  const { showSuccess, showError } = useToast();
 
-  const employerColumns = [
-    { key: "company", label: "Company" },
-    { key: "email", label: "Email" },
-    { key: "industry", label: "Industry" },
-    { key: "jobs", label: "Jobs Posted" },
-    { key: "status", label: "Status" },
-    { key: "createdAt", label: "Created" },
-  ];
-
-  const handleCreateEmployer = (employerData: any) => {
-    const newEmployer: Employer = {
-      id: Date.now().toString(),
-      company: employerData.company,
-      email: employerData.email,
-      industry: employerData.industry,
-      jobs: 0,
-      status: "Active",
-      createdAt: new Date().toISOString().split("T")[0],
-    };
-    setEmployers([...employers, newEmployer]);
-    setIsCreateModalOpen(false);
-  };
-
-  const filteredEmployers = employers.filter(
-    (employer) =>
-      employer.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      employer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      employer.industry.toLowerCase().includes(searchQuery.toLowerCase())
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isCreateEmployerModalOpen, setIsCreateEmployerModalOpen] =
+    useState(false);
+  const [isCreateCompanyModalOpen, setIsCreateCompanyModalOpen] =
+    useState(false);
+  const [isUpdateEmployerModalOpen, setIsUpdateEmployerModalOpen] =
+    useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [selectedEmployer, setSelectedEmployer] = useState<Employer | null>(
+    null
   );
 
+  const search = searchTerm.toLowerCase();
+  const filteredEmployers = employers.filter((employer) => {
+    const companyName = employer.company?.name ?? "";
+    const email = employer.email ?? "";
+    const fullName = employer.fullName ?? "";
+    return (
+      companyName.toLowerCase().includes(search) ||
+      email.toLowerCase().includes(search) ||
+      fullName.toLowerCase().includes(search)
+    );
+  });
+
+  const columns = [
+    {
+      key: "company" as keyof Employer,
+      label: "Company",
+      render: (employer: Employer) => (
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+            <Building2 className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <div className="font-medium text-gray-900">
+              {employer.company?.name ?? "N/A"}
+            </div>
+            <div className="text-sm text-gray-500">
+              {employer.company?.industry ?? "N/A"}
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "name" as keyof Employer,
+      label: "Contact Person",
+      render: (employer: Employer) => (
+        <div>
+          <div className="font-medium text-gray-900">{employer.fullName}</div>
+          <div className="text-sm text-gray-500">
+            {employer.position || "N/A"}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "email" as keyof Employer,
+      label: "Contact Info",
+      render: (employer: Employer) => (
+        <div className="space-y-1">
+          <div className="flex items-center text-sm text-gray-600">
+            <Mail className="w-4 h-4 mr-2" />
+            {employer.email}
+          </div>
+          {employer.phone && (
+            <div className="flex items-center text-sm text-gray-600">
+              <Phone className="w-4 h-4 mr-2" />
+              {employer.phone}
+            </div>
+          )}
+          {(employer.company?.city || employer.company?.state) && (
+            <div className="flex items-center text-sm text-gray-600">
+              <MapPin className="w-4 h-4 mr-2" />
+              {employer.company?.city}
+              {employer.company?.city && employer.company?.state ? ", " : ""}
+              {employer.company?.state}
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "actions" as keyof Employer,
+      label: "Actions",
+      render: (employer: Employer) => (
+        <div className="flex space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setSelectedEmployer(employer);
+              setIsUpdateEmployerModalOpen(true);
+            }}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setSelectedEmployer(employer);
+              setIsConfirmOpen(true);
+            }}
+            className="text-red-600 hover:text-red-700 hover:border-red-300"
+          >
+            Delete
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  const handleConfirmDelete = () => {
+    if (selectedEmployer) {
+      deleteEmployer(selectedEmployer.id);
+    }
+    setIsConfirmOpen(false);
+    setSelectedEmployer(null);
+  };
+
+  const handleCreateCompany = async (companyData: CreateCompanyRequest) => {
+    try {
+      const response = await companyApi.createCompany(companyData);
+      if (response.success) {
+        showSuccess("Company created successfully!");
+        setIsCreateCompanyModalOpen(false);
+      }
+    } catch (error) {
+      console.error("Failed to create company:", error);
+      showError("Failed to create company!");
+    }
+  };
+
+  const handleCreateEmployer = async (employerData: EmployerFormData) => {
+    try {
+      // First register the user with role "Employer"
+      const registerResponse = await register({
+        email: employerData.email,
+        password: employerData.password,
+        fullName: employerData.name,
+        companyId: employerData.companyId,
+        position: employerData.position,
+        phone: employerData.phone,
+        role: "Employer",
+      });
+
+      if (registerResponse) {
+        showSuccess("Employer created successfully!");
+        setIsCreateEmployerModalOpen(false);
+      }
+    } catch (error) {
+      console.error("Failed to create employer:", error);
+      showError("Failed to create employer!");
+    }
+  };
+
+  const handleUpdateEmployer = async (
+    data: Partial<{
+      fullName: string;
+      position: string;
+      companyId: string;
+      email: string;
+      phone: string;
+    }>
+  ) => {
+    if (!selectedEmployer) return;
+    try {
+      await updateEmployer(selectedEmployer.id, {
+        fullName: data.fullName,
+        position: data.position,
+        phone: data.phone,
+        email: data.email,
+        company: data.companyId,
+      });
+      setIsUpdateEmployerModalOpen(false);
+      setSelectedEmployer(null);
+    } catch {
+      // error toasts handled in hook
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <p className="text-red-600">Error loading employers: {error}</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-xl shadow-sm">
-      <div className="p-6 border-b border-gray-100">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <h2 className="text-xl font-semibold text-gray-900">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">
             Employer Management
           </h2>
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={18}
-              />
-              <input
-                type="text"
-                placeholder="Search employers..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
-              />
-            </div>
-            <Button
-              onClick={() => setIsCreateModalOpen(true)}
-              variant="primary"
-              className="flex items-center"
-            >
-              <Plus size={16} className="mr-2" />
-              Add Employer
-            </Button>
-          </div>
+          <p className="text-gray-600">
+            Manage employer accounts and company information
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+          <Button
+            variant="outline"
+            className="flex items-center justify-center w-full sm:w-auto"
+            onClick={() => setIsCreateCompanyModalOpen(true)}
+          >
+            <Building className="w-4 h-4 mr-2" />
+            Add Company
+          </Button>
+          <Button
+            className="flex items-center justify-center w-full sm:w-auto"
+            onClick={() => setIsCreateEmployerModalOpen(true)}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Employer
+          </Button>
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              {employerColumns.map((column) => (
-                <th
-                  key={column.key}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  {column.label}
-                </th>
-              ))}
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredEmployers.map((employer) => (
-              <tr key={employer.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {employer.company}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {employer.email}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {employer.industry}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {employer.jobs}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      employer.status === "Active"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {employer.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {employer.createdAt}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-                  <Button variant="outline" size="sm">
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    Deactivate
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="bg-white rounded-lg shadow">
+        <div className="p-6 border-b border-gray-200">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search employers..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        <DataTable data={filteredEmployers} columns={columns} />
       </div>
 
-      {isCreateModalOpen && (
+      {isCreateCompanyModalOpen && (
+        <CreateCompanyModal
+          onClose={() => setIsCreateCompanyModalOpen(false)}
+          onSubmit={handleCreateCompany}
+        />
+      )}
+
+      {isCreateEmployerModalOpen && (
         <CreateEmployerModal
-          onClose={() => setIsCreateModalOpen(false)}
+          onClose={() => setIsCreateEmployerModalOpen(false)}
           onSubmit={handleCreateEmployer}
         />
       )}
+
+      {isUpdateEmployerModalOpen && (
+        <UpdateEmployerModal
+          isOpen={isUpdateEmployerModalOpen}
+          employer={selectedEmployer}
+          onClose={() => {
+            setIsUpdateEmployerModalOpen(false);
+            setSelectedEmployer(null);
+          }}
+          onSubmit={handleUpdateEmployer}
+        />
+      )}
+
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        title="Delete Employer"
+        message={`Are you sure you want to delete ${
+          selectedEmployer?.email || "this employer"
+        }?`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          setIsConfirmOpen(false);
+          setSelectedEmployer(null);
+        }}
+      />
     </div>
   );
 }

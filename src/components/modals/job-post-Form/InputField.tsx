@@ -1,4 +1,5 @@
 import React from "react";
+import Astick from "../../ui/Astick";
 
 interface InputFieldProps {
   id: string;
@@ -10,6 +11,10 @@ interface InputFieldProps {
   icon: React.ReactNode;
   error?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
+  min?: string;
+  max?: string;
+  asterisk?: boolean;
 }
 
 export function InputField({
@@ -22,6 +27,10 @@ export function InputField({
   icon,
   error,
   onChange,
+  required = false,
+  min,
+  max,
+  asterisk = false,
 }: InputFieldProps) {
   return (
     <div>
@@ -30,6 +39,7 @@ export function InputField({
         className="block text-sm font-medium text-gray-700 mb-2"
       >
         {label}
+        {asterisk && <Astick />}
       </label>
       <div className="relative">
         <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
@@ -45,6 +55,9 @@ export function InputField({
           className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
             error ? "border-red-300" : "border-gray-300"
           }`}
+          required={required}
+          min={min}
+          max={max}
         />
       </div>
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}

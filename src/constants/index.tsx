@@ -1,6 +1,7 @@
 import {
   Bookmark,
   Briefcase,
+  BriefcaseBusiness,
   GraduationCap,
   LucideUsers2,
   Plus,
@@ -65,100 +66,6 @@ export const employerColumns = [
   { key: "jobs", label: "Jobs Posted" },
 ];
 
-export const employerData = [
-  {
-    id: "1",
-    company: "TechCorp",
-    email: "hr@techcorp.com",
-    industry: "Technology",
-    jobs: 15,
-  },
-  {
-    id: "2",
-    company: "FinanceInc",
-    email: "careers@financeinc.com",
-    industry: "Finance",
-    jobs: 8,
-  },
-  {
-    id: "3",
-    company: "HealthCare Ltd",
-    email: "jobs@healthcare.com",
-    industry: "Healthcare",
-    jobs: 12,
-  },
-];
-
-export const jobColumns = [
-  { key: "title", label: "Job Title" },
-  { key: "company", label: "Company" },
-  { key: "location", label: "Location" },
-  { key: "applications", label: "Applications" },
-];
-
-export const jobData = [
-  {
-    id: "1",
-    title: "Software Engineer",
-    company: "TechCorp",
-    location: "New York",
-    applications: 145,
-  },
-  {
-    id: "2",
-    title: "Financial Analyst",
-    company: "FinanceInc",
-    location: "Chicago",
-    applications: 89,
-  },
-  {
-    id: "3",
-    title: "Nurse",
-    company: "HealthCare Ltd",
-    location: "Los Angeles",
-    applications: 67,
-  },
-];
-
-export const jobs = [
-  {
-    id: "1",
-    title: "Software Engineering Intern",
-    company: "TechCorp",
-    location: "New York, NY",
-    type: "Internship",
-    salary: "$25/hour",
-    description:
-      "Join our dynamic development team and work on cutting-edge web applications.",
-    posted: "2 days ago",
-    skills: ["React", "JavaScript", "Python"],
-  },
-  {
-    id: "2",
-    title: "Marketing Assistant",
-    company: "MarketPro",
-    location: "Chicago, IL",
-    type: "Part-time",
-    salary: "$20/hour",
-    description:
-      "Support marketing campaigns and social media management for growing startup.",
-    posted: "1 week ago",
-    skills: ["Social Media", "Content Creation", "Analytics"],
-  },
-  {
-    id: "3",
-    title: "Data Analyst",
-    company: "DataCo",
-    location: "San Francisco, CA",
-    type: "Full-time",
-    salary: "$70,000 - $85,000",
-    description:
-      "Analyze large datasets to derive business insights and support decision-making.",
-    posted: "3 days ago",
-    skills: ["SQL", "Python", "Tableau"],
-  },
-];
-
 export const myJobsColumns = [
   { key: "title", label: "Job Title" },
   { key: "applications", label: "Applications" },
@@ -191,10 +98,10 @@ export const myJobsData = [
 ];
 
 export const tabs = [
-  { key: "jobs", label: "My Jobs", icon: Plus },
+  { key: "jobs", label: "My Jobs", icon: BriefcaseBusiness },
   { key: "post", label: "Post Job", icon: Plus },
+  { key: "applicants", label: "Job Applicants", icon: LucideUsers2 },
   { key: "students", label: "Find Students", icon: Search },
-  { key: "student-applied", label: "Student Applications", icon: LucideUsers2 },
 ];
 
 export const appliedJobsColumns = [
@@ -232,4 +139,42 @@ export const studentTabs = [
   { key: "jobs", label: "Find Jobs", icon: Search },
   { key: "applied", label: "Applied Jobs", icon: Bookmark },
   { key: "profile", label: "Profile", icon: User },
+];
+
+// Job Search Filter Options
+export const jobTypeOptions = [
+  { value: "full-time", label: "Full-time" },
+  { value: "part-time", label: "Part-time" },
+];
+
+export const experienceLevelOptions = [
+  { value: "entry", label: "Entry Level" },
+  { value: "junior", label: "Junior" },
+  { value: "mid", label: "Mid Level" },
+  { value: "senior", label: "Senior" },
+];
+
+export const jobStatusOptions = [
+  { value: "active", label: "Active" },
+  { value: "closed", label: "Closed" },
+  { value: "draft", label: "Draft" },
+];
+
+export const sortByOptions = [
+  { value: "title", label: "Job Title" },
+  { value: "location", label: "Location" },
+  { value: "salary", label: "Salary" },
+  { value: "posted", label: "Posted Date" },
+  { value: "applications", label: "Applications" },
+];
+
+export const sortOrderOptions = [
+  { value: "asc", label: "Ascending" },
+  { value: "desc", label: "Descending" },
+];
+
+export const pageSizeOptions = [
+  { value: 10, label: "10 per page" },
+  { value: 20, label: "20 per page" },
+  { value: 50, label: "50 per page" },
 ];

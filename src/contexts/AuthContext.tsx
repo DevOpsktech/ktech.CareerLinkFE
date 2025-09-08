@@ -1,15 +1,22 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import type { AuthState, AuthUser } from "../types/auth";
+import { authApi } from "../api/authApi";
+import type {
+  AuthState,
+  AuthUser,
+  LoginCredentials,
+  RegisterCredentials,
+  UpdateCredentials,
+} from "../types/auth";
+import { useToast } from "./ToastContext";
 
 interface AuthContextType extends AuthState {
-  login: (
-    email: string,
-    password: string,
-    role: "admin" | "employer"
-  ) => Promise<boolean>;
-  loginWithMicrosoft: () => Promise<boolean>;
+  login: (credentials: LoginCredentials) => Promise<boolean>;
+  register: (credentials: RegisterCredentials) => Promise<boolean>;
   logout: () => void;
+  updateProfile: (data: UpdateCredentials) => Promise<boolean>;
+  deleteProfile: () => Promise<boolean>;
   setUser: (user: AuthUser | null) => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,141 +24,206 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
+    token: null,
     isLoading: false,
     error: null,
   });
+  const { showSuccess, showError } = useToast();
 
   // Check for existing session on mount
   useEffect(() => {
-    const savedUser = localStorage.getItem("careerlink_user");
-    if (savedUser) {
-      try {
-        const user = JSON.parse(savedUser);
-        setAuthState((prev) => ({ ...prev, user }));
-      } catch (error) {
-        localStorage.removeItem("careerlink_user");
-        console.log("Error parsing saved user data:", error);
+    const initializeAuth = async () => {
+      const token = authApi.getToken();
+      if (token && !authApi.isTokenExpired()) {
+        setAuthState((prev) => ({ ...prev, token, isLoading: true }));
+        try {
+          const response = await authApi.verifySession();
+          if (response.data) {
+            const user: AuthUser = {
+              ...response.data,
+              isAuthenticated: true,
+            };
+            setAuthState({ user, token, isLoading: false, error: null });
+          } else {
+            // Token is invalid, clear it
+            authApi.removeToken();
+            setAuthState({
+              user: null,
+              token: null,
+              isLoading: false,
+              error: null,
+            });
+          }
+        } catch (error) {
+          console.error("Failed to verify session:", error);
+          showError("Failed to verify session");
+          authApi.removeToken();
+          setAuthState({
+            user: null,
+            token: null,
+            isLoading: false,
+            error: null,
+          });
+        }
       }
-    }
+    };
+
+    initializeAuth();
   }, []);
 
-  const login = async (
-    email: string,
-    password: string,
-    role: "admin" | "employer"
-  ): Promise<boolean> => {
+  const login = async (credentials: LoginCredentials): Promise<boolean> => {
     setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // Simulate API call - replace with actual authentication
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await authApi.login(credentials);
 
-      // Mock authentication logic
-      if (role === "admin") {
-        if (email === "admin@careerlink.com" && password === "admin123") {
-          const user: AuthUser = {
-            id: "admin-1",
-            email,
-            name: "System Administrator",
-            role: "admin",
-            isAuthenticated: true,
-          };
-          setAuthState({ user, isLoading: false, error: null });
-          localStorage.setItem("careerlink_user", JSON.stringify(user));
-          return true;
-        }
-      } else if (role === "employer") {
-        // Mock employer validation - replace with actual database check
-        const mockEmployers = [
-          {
-            email: "hr@techcorp.com",
-            password: "tech123",
-            name: "TechCorp HR",
-            company: "TechCorp",
-          },
-          {
-            email: "careers@financeinc.com",
-            password: "finance123",
-            name: "Finance Inc HR",
-            company: "Finance Inc",
-          },
-        ];
-
-        const employer = mockEmployers.find(
-          (emp) => emp.email === email && emp.password === password
-        );
-        if (employer) {
-          const user: AuthUser = {
-            id: "employer-1",
-            email,
-            name: employer.name,
-            role: "employer",
-            isAuthenticated: true,
-          };
-          setAuthState({ user, isLoading: false, error: null });
-          localStorage.setItem("careerlink_user", JSON.stringify(user));
-          return true;
-        }
+      if (!response.data) {
+        showError("No data received from login response");
+        throw new Error("No data received from login response");
       }
 
-      setAuthState((prev) => ({
-        ...prev,
-        isLoading: false,
-        error: "Invalid credentials",
-      }));
-      return false;
+      const { token, user } = response.data;
+
+      if (!token) {
+        showError("No token received from login response");
+        throw new Error("No token received from login response");
+      }
+
+      if (!user) {
+        showError("No user data received from login response");
+        throw new Error("No user data received from login response");
+      }
+
+      // Store token
+      authApi.storeToken(token);
+
+      // Create AuthUser object
+      const authUser: AuthUser = {
+        ...user,
+        userName: user.email, // Backend returns email as userName
+        role: user.role as "Student" | "Employer" | "Admin",
+        isAuthenticated: true,
+      };
+
+      setAuthState({ user: authUser, token, isLoading: false, error: null });
+      showSuccess("Login successful");
+      return true;
     } catch (error) {
+      console.error("Login error:", error); // Debug log
+      showError("Login failed");
+      const errorMessage =
+        error instanceof Error ? error.message : "Login failed";
       setAuthState((prev) => ({
         ...prev,
         isLoading: false,
-        error: "Login failed",
+        error: errorMessage,
       }));
-      console.log("Error parsing saved user data:", error);
       return false;
     }
   };
 
-  const loginWithMicrosoft = async (): Promise<boolean> => {
+  const register = async (
+    credentials: RegisterCredentials
+  ): Promise<boolean> => {
     setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // Simulate Microsoft OAuth - replace with actual MSAL implementation
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Mock successful OAuth response
-      const user: AuthUser = {
-        id: "student-1",
-        email: "student@university.edu",
-        name: "Haider Ghadi",
-        role: "student",
-        isAuthenticated: true,
-      };
-
-      setAuthState({ user, isLoading: false, error: null });
-      localStorage.setItem("careerlink_user", JSON.stringify(user));
+      await authApi.register(credentials);
+      setAuthState((prev) => ({ ...prev, isLoading: false, error: null }));
+      showSuccess("Registration successful");
       return true;
     } catch (error) {
+      showError("Registration failed");
+      const errorMessage =
+        error instanceof Error ? error.message : "Registration failed";
       setAuthState((prev) => ({
         ...prev,
         isLoading: false,
-        error: "Microsoft login failed",
+        error: errorMessage,
       }));
-      console.log("Error parsing saved user data:", error);
       return false;
     }
   };
 
   const logout = () => {
-    setAuthState({ user: null, isLoading: false, error: null });
-    localStorage.removeItem("careerlink_user");
+    authApi.removeToken();
+    setAuthState({ user: null, token: null, isLoading: false, error: null });
+  };
+
+  const updateProfile = async (data: UpdateCredentials): Promise<boolean> => {
+    setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+    try {
+      await authApi.updateProfile(data);
+
+      // Refresh user data
+      await refreshUser();
+      setAuthState((prev) => ({ ...prev, isLoading: false, error: null }));
+      showSuccess("Profile updated successfully");
+      return true;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Profile update failed";
+      setAuthState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: errorMessage,
+      }));
+      showError("Profile update failed");
+      return false;
+    }
+  };
+
+  const deleteProfile = async (): Promise<boolean> => {
+    setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+    try {
+      await authApi.deleteProfile();
+      logout(); // Clear auth state after deletion
+      showSuccess("Profile deleted successfully");
+      return true;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Profile deletion failed";
+      setAuthState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: errorMessage,
+      }));
+      showError("Profile deletion failed");
+      return false;
+    }
   };
 
   const setUser = (user: AuthUser | null) => {
     setAuthState((prev) => ({ ...prev, user }));
-    if (user) {
-      localStorage.setItem("careerlink_user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("careerlink_user");
+  };
+
+  const refreshUser = async () => {
+    try {
+      const response = await authApi.verifySession();
+      if (response.data) {
+        const user: AuthUser = {
+          ...response.data,
+          isAuthenticated: true,
+        };
+        setAuthState((prev) => ({ ...prev, user }));
+        showSuccess("User refreshed successfully");
+      } else {
+        setAuthState({
+          user: null,
+          token: null,
+          isLoading: false,
+          error: null,
+        });
+        authApi.removeToken();
+        showError("User refresh failed");
+      }
+    } catch (error) {
+      console.error("Failed to refresh user session:", error);
+      setAuthState({ user: null, token: null, isLoading: false, error: null });
+      authApi.removeToken();
+      showError("User refresh failed");
     }
   };
 
@@ -160,9 +232,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         ...authState,
         login,
-        loginWithMicrosoft,
+        register,
         logout,
+        updateProfile,
+        deleteProfile,
         setUser,
+        refreshUser,
       }}
     >
       {children}
@@ -170,6 +245,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
