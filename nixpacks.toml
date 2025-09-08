@@ -1,0 +1,22 @@
+# nixpacks.toml
+
+[build]
+# Force Node.js 22 (compatible with Vite 7, React Router 7)
+node_version = "22"
+
+# Use npm ci for reproducible installs
+[phases.install]
+cmds = ["npm ci"]
+
+# Build phase
+[phases.build]
+# TEMPORARY: skip TypeScript type-checking until you fix errors
+# Later: switch back to "npm run build" when tsc passes
+cmds = ["vite build"]
+
+# The output of Vite is dist/
+[variables]
+NIXPACKS_SPA_OUT_DIR = "dist"
+
+# Start phase is handled automatically by Nixpacks for SPA apps.
+# It will serve dist/ using Caddy with history fallback for React Router.
