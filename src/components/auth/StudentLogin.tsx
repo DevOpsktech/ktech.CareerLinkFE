@@ -3,7 +3,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { Button } from "../ui/Button";
 import { GraduationCap, AlertCircle, Mail, Lock, User } from "lucide-react";
 import { useState } from "react";
-
+// StudentLogin component
 export function StudentLogin() {
   const { login, register, isLoading, error } = useAuth();
   const navigate = useNavigate();
