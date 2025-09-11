@@ -32,7 +32,107 @@ export function DataTable({
   onDelete,
 }: DataTableProps) {
   const navigate = useNavigate();
-  return (
+
+  // Mobile card view for small screens
+  const MobileCardView = () => (
+    <div className="space-y-4 p-4">
+      {data.length === 0 ? (
+        <div className="text-center py-8 text-sm text-gray-900">
+          No data found
+        </div>
+      ) : (
+        data.map((row, index) => (
+          <div
+            key={row.id || index}
+            className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+          >
+            <div className="space-y-3">
+              {columns.map((column) => (
+                <div key={column.key} className="flex flex-col">
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
+                    {column.label}
+                  </div>
+                  <div className="text-sm text-gray-900">
+                    {column.render ? (
+                      column.render(row)
+                    ) : (
+                      <span>
+                        {typeof row[column.key] === "object" &&
+                        row[column.key] !== null
+                          ? "[Object]"
+                          : String(row[column.key] || "")}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {(showActions || employerActions) && (
+                <div className="pt-3 border-t border-gray-100">
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                    Actions
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {showActions && (
+                      <>
+                        <button
+                          onClick={() => navigate(`/jobs/${row.id}`)}
+                          className="flex items-center gap-1 px-3 py-1.5 text-xs bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors"
+                        >
+                          <Eye size={14} />
+                          View
+                        </button>
+                        {editJobs && (
+                          <button
+                            onClick={() => onEdit && onEdit(row)}
+                            className="flex items-center gap-1 px-3 py-1.5 text-xs bg-green-50 text-green-600 rounded-md hover:bg-green-100 transition-colors"
+                          >
+                            <Edit size={14} />
+                            Edit
+                          </button>
+                        )}
+                        {onDelete && (
+                          <button
+                            onClick={() => onDelete && onDelete(row)}
+                            className="flex items-center gap-1 px-3 py-1.5 text-xs bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors"
+                          >
+                            <Trash2 size={14} />
+                            Delete
+                          </button>
+                        )}
+                      </>
+                    )}
+                    {employerActions && (
+                      <>
+                        <Button
+                          type="button"
+                          variant="red"
+                          size="sm"
+                          className="text-xs"
+                        >
+                          Reject
+                        </Button>
+                        <Button
+                          type="submit"
+                          variant="secondary"
+                          size="sm"
+                          className="text-xs"
+                        >
+                          Accept
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+
+  // Desktop table view
+  const DesktopTableView = () => (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
@@ -137,5 +237,19 @@ export function DataTable({
         </tbody>
       </table>
     </div>
+  );
+
+  return (
+    <>
+      {/* Mobile View */}
+      <div className="lg:hidden">
+        <MobileCardView />
+      </div>
+
+      {/* Desktop View */}
+      <div className="hidden lg:block">
+        <DesktopTableView />
+      </div>
+    </>
   );
 }

@@ -1,11 +1,20 @@
 import React, { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Button } from "../ui/Button";
-import { User, Mail, AlertCircle, CheckCircle, Trash2 } from "lucide-react";
+import {
+  User,
+  Mail,
+  AlertCircle,
+  CheckCircle,
+  Trash2,
+  ArrowLeft,
+} from "lucide-react";
 import { ConfirmModal } from "../ui/ConfirmModal";
+import { useNavigate } from "react-router-dom";
 
 export function ProfilePage() {
   const { user, updateProfile, deleteProfile, isLoading, error } = useAuth();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [formData, setFormData] = useState({
@@ -52,9 +61,33 @@ export function ProfilePage() {
     );
   }
 
+  const getDashboardPath = () => {
+    switch (user?.role) {
+      case "Admin":
+        return "/admin";
+      case "Employer":
+        return "/employer";
+      case "Student":
+        return "/student";
+      default:
+        return "/";
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50">
+      {/* Back Button */}
+      <div className="p-4">
+        <button
+          onClick={() => navigate(getDashboardPath())}
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeft size={20} />
+          <span>Back to Dashboard</span>
+        </button>
+      </div>
+
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           {/* Header */}
           <div className="px-6 py-4 border-b border-gray-200">
@@ -209,7 +242,6 @@ export function ProfilePage() {
         message="Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed."
         confirmText="Delete Account"
         cancelText="Cancel"
-        confirmVariant="danger"
         onConfirm={handleDeleteProfile}
         onCancel={() => setShowDeleteConfirm(false)}
       />

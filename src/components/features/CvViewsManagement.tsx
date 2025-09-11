@@ -94,8 +94,8 @@ export function CvViewsManagement() {
 
   return (
     <div className="bg-white rounded-xl shadow-sm">
-      <div className="p-6 border-b border-gray-100">
-        <div className="flex justify-between items-start">
+      <div className="p-4 sm:p-6 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
           <div>
             <h2 className="text-xl font-semibold text-gray-900 flex items-center">
               CV Views Management
@@ -108,7 +108,7 @@ export function CvViewsManagement() {
             variant="outline"
             onClick={fetchCvViews}
             disabled={loading}
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-2 w-full sm:w-auto"
           >
             <RefreshCw className="w-4 h-4" />
             <span>Refresh</span>
@@ -131,13 +131,13 @@ export function CvViewsManagement() {
       ) : (
         <>
           {/* Statistics */}
-          <div className="px-6 py-4 bg-gray-50 border-b border-gray-100">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="px-4 sm:px-6 py-4 bg-gray-50 border-b border-gray-100">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="flex items-center space-x-3">
-                <div className="bg-blue-100 p-2 rounded-lg">
+                <div className="bg-blue-100 p-2 rounded-lg flex-shrink-0">
                   <Eye className="w-5 h-5 text-blue-600" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm text-gray-500">Total Views</p>
                   <p className="text-lg font-semibold text-gray-900">
                     {cvViews.length}
@@ -145,21 +145,21 @@ export function CvViewsManagement() {
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="bg-green-100 p-2 rounded-lg">
+                <div className="bg-green-100 p-2 rounded-lg flex-shrink-0">
                   <User className="w-5 h-5 text-green-600" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm text-gray-500">Unique Students</p>
                   <p className="text-lg font-semibold text-gray-900">
                     {new Set(cvViews.map((view) => view.studentId)).size}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
-                <div className="bg-purple-100 p-2 rounded-lg">
+              <div className="flex items-center space-x-3 sm:col-span-2 lg:col-span-1">
+                <div className="bg-purple-100 p-2 rounded-lg flex-shrink-0">
                   <Building className="w-5 h-5 text-purple-600" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm text-gray-500">Active Companies</p>
                   <p className="text-lg font-semibold text-gray-900">
                     {new Set(cvViews.map((view) => view.companyName)).size}

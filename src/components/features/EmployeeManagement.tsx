@@ -66,14 +66,14 @@ export function EmployerManagement() {
       label: "Company",
       render: (employer: Employer) => (
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-            <Building2 className="w-5 h-5 text-blue-600" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
           </div>
-          <div>
-            <div className="font-medium text-gray-900">
+          <div className="min-w-0 flex-1">
+            <div className="font-medium text-gray-900 truncate">
               {employer.company?.name ?? "N/A"}
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 truncate">
               {employer.company?.industry ?? "N/A"}
             </div>
           </div>
@@ -84,9 +84,11 @@ export function EmployerManagement() {
       key: "name" as keyof Employer,
       label: "Contact Person",
       render: (employer: Employer) => (
-        <div>
-          <div className="font-medium text-gray-900">{employer.fullName}</div>
-          <div className="text-sm text-gray-500">
+        <div className="min-w-0">
+          <div className="font-medium text-gray-900 truncate">
+            {employer.fullName}
+          </div>
+          <div className="text-sm text-gray-500 truncate">
             {employer.position || "N/A"}
           </div>
         </div>
@@ -96,23 +98,25 @@ export function EmployerManagement() {
       key: "email" as keyof Employer,
       label: "Contact Info",
       render: (employer: Employer) => (
-        <div className="space-y-1">
+        <div className="space-y-1 min-w-0">
           <div className="flex items-center text-sm text-gray-600">
-            <Mail className="w-4 h-4 mr-2" />
-            {employer.email}
+            <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+            <span className="truncate">{employer.email}</span>
           </div>
           {employer.phone && (
             <div className="flex items-center text-sm text-gray-600">
-              <Phone className="w-4 h-4 mr-2" />
-              {employer.phone}
+              <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">{employer.phone}</span>
             </div>
           )}
           {(employer.company?.city || employer.company?.state) && (
             <div className="flex items-center text-sm text-gray-600">
-              <MapPin className="w-4 h-4 mr-2" />
-              {employer.company?.city}
-              {employer.company?.city && employer.company?.state ? ", " : ""}
-              {employer.company?.state}
+              <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">
+                {employer.company?.city}
+                {employer.company?.city && employer.company?.state ? ", " : ""}
+                {employer.company?.state}
+              </span>
             </div>
           )}
         </div>
@@ -122,10 +126,11 @@ export function EmployerManagement() {
       key: "actions" as keyof Employer,
       label: "Actions",
       render: (employer: Employer) => (
-        <div className="flex space-x-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button
             variant="outline"
             size="sm"
+            className="text-xs sm:text-sm"
             onClick={() => {
               setSelectedEmployer(employer);
               setIsUpdateEmployerModalOpen(true);
@@ -136,11 +141,11 @@ export function EmployerManagement() {
           <Button
             variant="outline"
             size="sm"
+            className="text-xs sm:text-sm text-red-600 hover:text-red-700 hover:border-red-300"
             onClick={() => {
               setSelectedEmployer(employer);
               setIsConfirmOpen(true);
             }}
-            className="text-red-600 hover:text-red-700 hover:border-red-300"
           >
             Delete
           </Button>
@@ -236,7 +241,7 @@ export function EmployerManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+      <div className="flex flex-col gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">
             Employer Management
@@ -245,7 +250,7 @@ export function EmployerManagement() {
             Manage employer accounts and company information
           </p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <Button
             variant="outline"
             className="flex items-center justify-center w-full sm:w-auto"
@@ -265,7 +270,7 @@ export function EmployerManagement() {
       </div>
 
       <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-4 sm:p-6 border-b border-gray-200">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input

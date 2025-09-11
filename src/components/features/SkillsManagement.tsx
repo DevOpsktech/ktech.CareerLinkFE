@@ -60,19 +60,23 @@ export function SkillsManagement() {
 
   return (
     <div className="bg-white rounded-xl shadow-sm">
-      <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+      <div className="p-4 sm:p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h2 className="text-xl font-semibold text-gray-900">Skills</h2>
           <p className="text-sm text-gray-500 mt-1">
             Manage the global skill taxonomy available across the platform.
           </p>
         </div>
-        <Button onClick={handleOpenAdd} variant="secondary">
+        <Button
+          onClick={handleOpenAdd}
+          variant="secondary"
+          className="w-full sm:w-auto"
+        >
           Add Skill
         </Button>
       </div>
 
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {loading ? (
           <div className="text-gray-500">Loading skills...</div>
         ) : skills.length === 0 ? (

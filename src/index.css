@@ -1,1 +1,222 @@
 @import "tailwindcss";
+
+
+
+
+
+
+/* Custom animations for sidebar and mobile menu */
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-down {
+  animation: slide-down 0.2s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Custom scrollbar for sidebar */
+.sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 2px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
+}
+
+/* Smooth transitions for sidebar collapse */
+.sidebar-transition {
+  transition: width 0.3s ease-in-out;
+}
+
+/* Mobile-first responsive design improvements */
+@media (max-width: 768px) {
+  .mobile-padding {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .mobile-text-sm {
+    font-size: 0.875rem;
+  }
+
+  /* Ensure mobile menu button is always visible */
+  .mobile-menu-button {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 50;
+  }
+
+  /* Mobile sidebar improvements */
+  .mobile-sidebar {
+    width: 20rem;
+    max-width: 85vw;
+  }
+
+  /* Ensure proper text wrapping and overflow handling */
+  .mobile-sidebar .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Better touch targets for mobile */
+  .mobile-sidebar button {
+    min-height: 44px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .mobile-sidebar {
+    width: 18rem;
+    max-width: 90vw;
+  }
+
+  .mobile-sidebar h2 {
+    font-size: 1rem;
+  }
+
+  .mobile-sidebar p {
+    font-size: 0.75rem;
+  }
+
+  .mobile-sidebar button {
+    padding: 0.75rem;
+  }
+}
+
+/* Dashboard component mobile improvements */
+@media (max-width: 768px) {
+  /* Ensure proper spacing for dashboard content */
+  .dashboard-content {
+    padding: 1rem;
+  }
+
+  /* Make cards stack properly on mobile */
+  .dashboard-card {
+    margin-bottom: 1rem;
+  }
+
+  /* Improve button layouts on mobile */
+  .mobile-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .mobile-button-group button {
+    width: 100%;
+  }
+
+  /* Better table/card layouts */
+  .mobile-data-view {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Improve form layouts */
+  .mobile-form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* Better text sizing for mobile */
+  .mobile-text-responsive {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  /* Improve modal layouts */
+  .mobile-modal {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+}
+
+/* Ensure proper z-index stacking */
+.sidebar-overlay {
+  z-index: 50;
+}
+
+.sidebar-content {
+  z-index: 51;
+}
+
+/* Hover effects for better UX */
+.hover-lift {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Focus states for accessibility */
+.focus-ring:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

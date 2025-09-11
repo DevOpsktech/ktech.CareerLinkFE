@@ -46,18 +46,20 @@ const CompanyTable = () => {
             <img
               src={row.logoUrl}
               alt={String(row.name)}
-              className="w-8 h-8 rounded-full object-cover"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover flex-shrink-0"
             />
           ) : (
-            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
               <Building2 size={16} className="text-gray-500" />
             </div>
           )}
-          <div>
-            <div className="font-medium text-gray-900">{String(row.name)}</div>
+          <div className="min-w-0 flex-1">
+            <div className="font-medium text-gray-900 truncate">
+              {String(row.name)}
+            </div>
             {typeof row.website === "string" && row.website !== "N/A" && (
               <div className="flex items-center text-xs text-gray-500">
-                <Globe size={12} className="mr-1" />
+                <Globe size={12} className="mr-1 flex-shrink-0" />
                 <a
                   href={
                     String(row.website).startsWith("http")
@@ -66,7 +68,7 @@ const CompanyTable = () => {
                   }
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-blue-600"
+                  className="hover:text-blue-600 truncate"
                 >
                   {String(row.website)}
                 </a>
@@ -85,36 +87,6 @@ const CompanyTable = () => {
         </span>
       ),
     },
-    // {
-    //   key: "location",
-    //   label: "Location",
-    //   render: (row: Record<string, unknown>) => (
-    //     <div className="flex items-center text-sm text-gray-600">
-    //       <MapPin size={14} className="mr-1" />
-    //       {String(row.location)}
-    //     </div>
-    //   ),
-    // },
-    // {
-    //   key: "companySize",
-    //   label: "Size",
-    //   render: (row: Record<string, unknown>) => (
-    //     <div className="flex items-center text-sm text-gray-600">
-    //       <Users size={14} className="mr-1" />
-    //       {String(row.companySize)}
-    //     </div>
-    //   ),
-    // },
-    // {
-    //   key: "foundedYear",
-    //   label: "Founded",
-    //   render: (row: Record<string, unknown>) => (
-    //     <div className="flex items-center text-sm text-gray-600">
-    //       <Calendar size={14} className="mr-1" />
-    //       {String(row.foundedYear)}
-    //     </div>
-    //   ),
-    // },
     {
       key: "createdAt",
       label: "Joined",
@@ -126,16 +98,17 @@ const CompanyTable = () => {
       key: "actions",
       label: "Actions",
       render: (row: Record<string, unknown>) => (
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
           <button
             onClick={() => {
               setSelectedCompany(row);
               setIsViewOpen(true);
             }}
-            className="text-blue-600 hover:text-blue-800 p-1 rounded transition-colors"
+            className="flex items-center gap-1 px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors"
             aria-label="View"
           >
-            <Eye size={16} />
+            <Eye size={14} />
+            <span className="hidden sm:inline">View</span>
           </button>
           <button
             onClick={() => {
@@ -156,20 +129,22 @@ const CompanyTable = () => {
               });
               setIsEditOpen(true);
             }}
-            className="text-green-600 hover:text-green-800 p-1 rounded transition-colors"
+            className="flex items-center gap-1 px-2 py-1 text-xs bg-green-50 text-green-600 rounded-md hover:bg-green-100 transition-colors"
             aria-label="Edit"
           >
-            <Edit size={16} />
+            <Edit size={14} />
+            <span className="hidden sm:inline">Edit</span>
           </button>
           <button
             onClick={() => {
               setSelectedCompany(row);
               setIsConfirmOpen(true);
             }}
-            className="text-red-600 hover:text-red-800 p-1 rounded transition-colors"
+            className="flex items-center gap-1 px-2 py-1 text-xs bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors"
             aria-label="Delete"
           >
-            <Trash2 size={16} />
+            <Trash2 size={14} />
+            <span className="hidden sm:inline">Delete</span>
           </button>
         </div>
       ),
@@ -205,7 +180,7 @@ const CompanyTable = () => {
 
   return (
     <div className="bg-white rounded-xl shadow-sm">
-      <div className="p-6 border-b border-gray-100">
+      <div className="p-4 sm:p-6 border-b border-gray-100">
         <h2 className="text-xl font-semibold text-gray-900">Companies</h2>
       </div>
       <DataTable columns={companyColumns} data={transformedCompaniesData} />
