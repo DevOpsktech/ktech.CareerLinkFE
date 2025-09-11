@@ -31,13 +31,12 @@ export function DashboardLayout({
   className = "",
 }: DashboardLayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-secondary flex">
       {/* Sidebar */}
       <Sidebar
         items={sidebarItems}
         activeItem={activeItem}
         onItemClick={onItemClick}
-        title={title}
         userRole={userRole}
       />
 
@@ -45,7 +44,7 @@ export function DashboardLayout({
       <div className="flex-1 lg:ml-0">
         <div className={`min-h-screen ${className}`}>
           {/* Content */}
-          <div className="p-4 lg:p-6">{children}</div>
+          <div className="p-4 lg:p-6 bg-secondary">{children}</div>
         </div>
       </div>
     </div>

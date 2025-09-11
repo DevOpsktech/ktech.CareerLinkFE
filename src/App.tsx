@@ -1,6 +1,9 @@
+import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ToastProvider } from "./contexts/ToastContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import { preloadLogosAsync } from "./utils/logoPreloader";
 import { LoginPage } from "./components/auth/LoginPage";
 import { RegisterPage } from "./components/auth/RegisterPage";
 import { ProfilePage } from "./components/auth/ProfilePage";
@@ -23,7 +26,7 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-secondary">
       <Routes>
         {/* Profile Route - Available to all authenticated users */}
         <Route path="/profile" element={<ProfilePage />} />
@@ -91,12 +94,19 @@ function AppContent() {
 }
 
 function App() {
+  // Preload logo assets when app starts
+  React.useEffect(() => {
+    preloadLogosAsync();
+  }, []);
+
   return (
-    <ToastProvider>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </ToastProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
 

@@ -1,9 +1,271 @@
 @import "tailwindcss";
 
+/* Import Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Dazzed:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700&display=swap");
 
+/* CSS Variables for Theme System */
+:root {
+  /* Primary Colors */
+  --color-white: #ffffff;
+  --color-dark-blue: #11173f;
+  --color-medium-blue: #212efe;
+  --color-light-purplish: #445db7;
+  --color-lightest-blue: #8893d3;
+  --color-lightest-purple: #bac2e8;
 
+  /* Secondary Colors */
+  --color-red-primary: #f24b2a;
+  --color-red-dark: #792615;
+  --color-red-darker: #3d130b;
+  --color-green-primary: #009e8b;
+  --color-green-dark: #132a27;
+  --color-green-darker: #26544d;
+  --color-yellow-primary: #fed10a;
+  --color-yellow-dark: #9e820d;
+  --color-yellow-darker: #4f4107;
 
+  /* Light Theme Variables */
+  --bg-primary: var(--color-white);
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --text-primary: var(--color-dark-blue);
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e1;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
 
+  /* Font Families */
+  --font-english: "Dazzed", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+  --font-arabic: "Almarai", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+
+  /* Spacing and Layout */
+  --sidebar-width: 16rem;
+  --sidebar-width-collapsed: 4rem;
+  --header-height: 4rem;
+  --border-radius: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-xl: 1rem;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.3s ease-in-out;
+  --transition-slow: 0.5s ease-in-out;
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+  --bg-primary: var(--color-dark-blue);
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --text-primary: var(--color-white);
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border-primary: #475569;
+  --border-secondary: #64748b;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3),
+    0 4px 6px -4px rgb(0 0 0 / 0.3);
+}
+
+/* RTL Support for Arabic */
+[dir="rtl"] {
+  --sidebar-width: 16rem;
+  --sidebar-width-collapsed: 4rem;
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-english);
+  direction: ltr;
+}
+
+[dir="rtl"] {
+  font-family: var(--font-arabic);
+  direction: rtl;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color var(--transition-normal),
+    color var(--transition-normal);
+  font-family: var(--font-english);
+  line-height: 1.6;
+}
+
+[dir="rtl"] body {
+  font-family: var(--font-arabic);
+}
+
+/* Theme-aware utility classes */
+.bg-primary {
+  background-color: var(--bg-primary);
+}
+
+.bg-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.bg-tertiary {
+  background-color: var(--bg-tertiary);
+}
+
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.border-primary {
+  border-color: var(--border-primary);
+}
+
+.border-secondary {
+  border-color: var(--border-secondary);
+}
+
+.shadow-theme-sm {
+  box-shadow: var(--shadow-sm);
+}
+
+.shadow-theme-md {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-theme-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+/* Custom color classes */
+.bg-dark-blue {
+  background-color: var(--color-dark-blue);
+}
+
+.bg-medium-blue {
+  background-color: var(--color-medium-blue);
+}
+
+.bg-light-purplish {
+  background-color: var(--color-light-purplish);
+}
+
+.bg-lightest-blue {
+  background-color: var(--color-lightest-blue);
+}
+
+.bg-lightest-purple {
+  background-color: var(--color-lightest-purple);
+}
+
+.text-dark-blue {
+  color: var(--color-dark-blue);
+}
+
+.text-medium-blue {
+  color: var(--color-medium-blue);
+}
+
+.text-light-purplish {
+  color: var(--color-light-purplish);
+}
+
+.text-lightest-blue {
+  color: var(--color-lightest-blue);
+}
+
+.text-lightest-purple {
+  color: var(--color-lightest-purple);
+}
+
+/* Button variants */
+.btn-primary {
+  background-color: var(--color-medium-blue);
+  color: var(--color-white);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-light-purplish);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background-color: var(--color-lightest-blue);
+  color: var(--color-dark-blue);
+  border: 1px solid var(--color-lightest-purple);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-lightest-purple);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Card styles */
+.card {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Input styles */
+.input {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius);
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-medium-blue);
+  box-shadow: 0 0 0 3px rgba(33, 46, 254, 0.1);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
 
 /* Custom animations for sidebar and mobile menu */
 @keyframes slide-down {
